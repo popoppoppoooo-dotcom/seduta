@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seduta: guida</title>
+<style>
+:root { --bg:#14110f; --pan:#1f1b18; --riga:#3a332d; --tx:#f3ece4; --tx2:#b8ab9d; --acc:#ff8a3d; --warn:#ffcc4d; color-scheme: dark; }
+@media (prefers-color-scheme: light) { :root { --bg:#f6f1ea; --pan:#fffaf4; --riga:#ddd0c1; --tx:#1d1712; --tx2:#5e5145; --acc:#d9601a; --warn:#9a6a00; color-scheme: light; } }
+body { margin:0; background:var(--bg); color:var(--tx); font:16px/1.55 system-ui,-apple-system,Roboto,sans-serif; }
+main { max-width:720px; margin:0 auto; padding:20px 16px 60px; }
+h1 { font-size:26px; margin:0 0 4px; } h2 { font-size:19px; margin:28px 0 8px; color:var(--acc); }
+.sub { color:var(--tx2); margin:0 0 18px; }
+.card { background:var(--pan); border:1px solid var(--riga); border-radius:14px; padding:12px 16px; margin:10px 0; }
+code { background:var(--riga); padding:1px 6px; border-radius:6px; font-size:14px; }
+.nota { border-left:3px solid var(--warn); padding:6px 12px; color:var(--tx2); }
+li { margin:4px 0; }
+</style>
+</head>
+<body><main>
+<h1>Seduta</h1>
+<p class="sub">L'app della palestra sul Pixel 9a: ti dice cosa fare oggi, con i carichi già calcolati, e tu confermi o correggi.</p>
+
+<h2>Come funziona in palestra</h2>
+<div class="card"><ol>
+<li>Apri <b>Seduta</b>. In alto vedi settimana e blocco; sotto, la seduta consigliata (A, B, C o D).</li>
+<li>Rispondi alle <b>3 domande</b> (sonno, indolenzimento, energia: un tocco ciascuna, facoltative). <b>Verde</b>: seduta normale. <b>Giallo</b>: una serie in meno e un RIR in più, carichi uguali. <b>Rosso</b>: anche niente salti, e se toccava A o C ti propone B o D. Con febbre: niente seduta.</li>
+<li>Tocca <b>Inizia</b>. Ogni esercizio mostra il piano (es. <code>4 × 4 @ 110 kg · RIR 1-2</code>), il motivo del carico e cosa hai fatto l'ultima volta.</li>
+<li><b>Squat e stacco</b>: tocca <b>Avvicinamento</b> per le serie di riscaldamento già calcolate (es. <code>20×8 · 45×5 · 65×3 · 82,5×2 · 92,5×1</code>) e i dischi da mettere per lato (es. <code>per lato a 110: 25 + 20</code>, bilanciere da 20 kg).</li>
+<li>Dopo ogni serie: se è andata come previsto tocca <b>✓</b>. Se no, correggi prima con <b>−</b>/<b>+</b> (o scrivi il numero). Un carico corretto passa da solo alle serie successive.</li>
+<li>Dopo il ✓ tocca il <b>RIR</b> (quante ripetizioni ti restavano: 0, 1, 2, 3, 4+). Serve all'app per decidere quando aumentare.</li>
+<li><b>Controllo della prima serie</b>: su squat e stacco, se la prima serie è molto più dura del previsto (ripetizioni mancate o RIR 2 sotto), l'app abbassa da sola le serie rimanenti al carico della settimana prima e te lo scrive.</li>
+<li>Macchina occupata? <b>Cambia</b>: scegli un'alternativa (con il suo carico, calcolato dalla volta che l'hai già fatta) o scrivi un esercizio a mano. Vale solo per oggi.</li>
+<li>Alla fine <b>Fine seduta</b>: ottieni il testo come sul taccuino, da copiare o condividere.</li>
+</ol>
+<p class="nota">Se chiudi l'app a metà, la seduta resta lì com'era. Il timer non c'è: vai a occhio.</p></div>
+
+<h2>Come decide i carichi</h2>
+<div class="card"><ul>
+<li><b>Dolore</b>: su squat e stacco c'è il pulsante <b>Dolore</b>. Toccalo se la schiena fa male: la volta dopo il carico scende di un gradino. Sopra 3 su 10, chiudi l'esercizio lì e chiedi al coach.</li>
+<li><b>Stacco</b>: in C viene <b>prima</b> delle trazioni. Riparte da 90 kg e sale di 2,5 kg a settimana fino a 115 × 3 a dicembre. Filma di lato la seconda serie.</li>
+<li><b>Squat e stacco</b>: seguono la tabella del programma. Se l'ultima volta avevi fatto meno del previsto, mantiene lo scarto; se manchi una ripetizione, scende di un gradino; se hai finito a RIR 0 o con la tecnica peggiorata, ripete il carico.</li>
+<li><b>Accessori</b> (doppia progressione): +1 ripetizione per serie finché arrivi in cima al range con almeno 1 di RIR, poi sale di peso e riparti dal fondo.</li>
+<li><b>Trazioni</b>: 4 serie, a scala. Dopo ogni seduta pulita l'app aggiunge una ripetizione a una sola serie (6-6-6-6 → 7-6-6-6 → 7-7-6-6…), con un tetto sulla prima serie (8 nelle settimane 7-9, 9 nelle 10-11, 10 nelle 13-14). Se l'ultima serie arriva a RIR 0 ripete; dopo due sedute non riuscite riparte da quello che hai fatto davvero. Nelle settimane 9 e 13 il test (una serie al massimo) è in B, e in A e C quella settimana le trazioni non ci sono.</li>
+<li>Settimane saltate: dopo una pausa non fa salti di carico.</li>
+<li><b>Verso dicembre</b> (in cima al piano della settimana): per trazioni, squat, stacco, panca e alzate mostra l'obiettivo e una stima di dove sei oggi, calcolata dalla serie migliore delle ultime 3 settimane. È una stima: il numero vero lo dà il test.</li>
+<li><b>Settimana corta</b>: se restano meno giorni che sedute (il sabato del tennis non conta), propone prima C, poi A, poi B, senza gambe due giorni di fila né di venerdì. Con 2 sole sedute A e C prendono gli esercizi chiave di B (tricipiti, croci inverse).</li>
+<li><b>Settimana 16 (test)</b>: lunedì squat, martedì prima panca 28 kg poi trazioni al massimo, giovedì stacco e alzate laterali. Il carico del tentativo non supera quello che i tuoi dati rendono realistico.</li>
+</ul></div>
+
+<h2>Corpo</h2>
+<div class="card"><ul>
+<li><b>Peso</b>: ogni mattina, dopo il bagno, prima di mangiare. Il grafico mostra la media di 7 giorni: conta quella, non il singolo giorno.</li>
+<li><b>Vita all'ombelico</b>: una volta a settimana, insieme al peso.</li>
+<li><b>Spalle, petto, braccio, coscia e foto</b> (fronte, lato, retro): ogni 4 settimane, stesso giorno, al mattino a digiuno e mai dopo l'allenamento. Le foto si confrontano affiancate.</li>
+<li><b>Come misurare</b>: metro da sarta non elastico, aderente senza stringere; due misure e la media. Le istruzioni punto per punto sono nella scheda Corpo. Senza metro va bene un cordino non elastico e un righello. Le misure sono facoltative: il peso e le foto contano di più.</li>
+</ul></div>
+
+<h2>Coach</h2>
+<div class="card"><p>Chiedi di esecuzione, dolori, alternative, peso, misure e foto. Il coach vede il programma, le ultime 4 settimane di sedute e i dati del corpo, più una base di conoscenze preparata sul Mac.</p>
+<ul>
+<li><b>Con la chiave Gemini</b> (gratuita) risponde dentro l'app.</li>
+<li><b>Senza chiave</b>: "Manda all'app Gemini" passa domanda e dati all'app Gemini del telefono.</li>
+</ul>
+<p class="nota">Con il livello gratuito Google può usare i messaggi per migliorare i suoi modelli: nelle foto del fisico evita il viso.</p></div>
+
+<h2>Da fare una volta sola</h2>
+<div class="card"><ol>
+<li><b>Sul Mac, nel Terminale</b>: <code>gh auth login</code> (GitHub.com → HTTPS → accedi con il browser). Poi dimmelo: pubblico l'app e ti do l'indirizzo.</li>
+<li><b>Sul Pixel</b>: apri l'indirizzo in Chrome → menu ⋮ → <b>Installa app</b>. Da lì funziona anche senza rete.</li>
+<li><b>Chiave Gemini</b>: <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> → Create API key → in Seduta: Altro → Assistente → incolla.</li>
+<li><b>Dati di partenza</b>: in Drive, cartella Assistenti/Palestra, c'è il file di import con profilo e carichi. Seduta → Altro → Importa → sceglilo da Drive.</li>
+<li><b>Niente distrazioni</b>: Altro → "Blocca l'app sullo schermo" spiega come fissare Seduta sul Pixel (serve il PIN per uscire).</li>
+</ol></div>
+
+<h2>Backup</h2>
+<div class="card"><p>I dati stanno solo sul telefono. Ogni settimana (l'app te lo ricorda): Altro → <b>Esporta</b> → Drive → cartella Assistenti/Palestra/Registro. Lo stesso file serve per ripristinare (Importa) e lo legge anche il coach sul Mac. La chiave Gemini non entra mai nel backup.</p></div>
+
+<h2>Cambiare il programma</h2>
+<div class="card"><p>Il programma sta in <code>~/seduta/programma.js</code>. Se il coach propone modifiche, portale a Claude sul Mac: le applica, controlla i test e ripubblica. Il telefono prende la versione nuova alla riapertura successiva.</p></div>
+</main></body></html>

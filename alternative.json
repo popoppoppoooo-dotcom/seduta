@@ -1,0 +1,1232 @@
+{
+  "A.salti": [
+    {
+      "id": "alt.boxJump",
+      "nome": "Box jump con discesa a gradino",
+      "quando": "entrambi",
+      "nota": "Atterri in alto sul box: meno impatto per ginocchia e tendine d'Achille. Scendi camminando.",
+      "inc": 0,
+      "kgDa": "box all'altezza del ginocchio"
+    },
+    {
+      "id": "alt.lancioPallaMedica",
+      "nome": "Lancio della palla medica sopra la testa all'indietro",
+      "quando": "dolore",
+      "nota": "Potenza di anche e gambe senza atterraggio.",
+      "inc": 0,
+      "kgDa": "palla da 4-6 kg"
+    }
+  ],
+  "C.balzi": [
+    {
+      "id": "alt.saltiVerticali",
+      "nome": "Salti verticali sul posto",
+      "quando": "occupato",
+      "nota": "Se manca lo spazio per i balzi: stessi criteri di qualità.",
+      "inc": 0,
+      "kgDa": "corpo libero"
+    },
+    {
+      "id": "alt.boxJump",
+      "nome": "Box jump con discesa a gradino",
+      "quando": "entrambi",
+      "nota": "Atterri in alto sul box: meno impatto per ginocchia e tendine d'Achille. Scendi camminando.",
+      "inc": 0,
+      "kgDa": "box all'altezza del ginocchio"
+    },
+    {
+      "id": "alt.lancioPallaMedica",
+      "nome": "Lancio della palla medica sopra la testa all'indietro",
+      "quando": "dolore",
+      "nota": "Potenza di anche e gambe senza atterraggio.",
+      "inc": 0,
+      "kgDa": "palla da 4-6 kg"
+    }
+  ],
+  "A.trazioni": [
+    {
+      "id": "alt.latMachinePesante",
+      "nome": "Lat machine pesante",
+      "quando": "occupato",
+      "nota": "Barra al petto alto, gomiti verso i fianchi; fasce se gli avambracci cedono.",
+      "inc": 5,
+      "kgDa": "da trovare: circa il peso corporeo meno 15-20 kg"
+    },
+    {
+      "id": "alt.trazioniPresaNeutra",
+      "nome": "Trazioni presa neutra",
+      "quando": "dolore",
+      "nota": "Maniglie parallele: più comode per gomito, polso e spalla.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniPresaSupina",
+      "nome": "Trazioni presa supina",
+      "quando": "dolore",
+      "nota": "Palmi verso di te, presa a larghezza spalle; gomiti davanti al busto.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniAssistite",
+      "nome": "Trazioni assistite alla macchina",
+      "quando": "entrambi",
+      "nota": "Il carico è l'assistenza: meno assistenza = più difficile. ROM pieno.",
+      "inc": 5,
+      "kgDa": "da trovare: assistenza minima che dà le ripetizioni previste"
+    }
+  ],
+  "B.trazioni": [
+    {
+      "id": "alt.latMachinePesante",
+      "nome": "Lat machine pesante",
+      "quando": "occupato",
+      "nota": "Barra al petto alto, gomiti verso i fianchi; fasce se gli avambracci cedono.",
+      "inc": 5,
+      "kgDa": "da trovare: circa il peso corporeo meno 15-20 kg"
+    },
+    {
+      "id": "alt.trazioniPresaNeutra",
+      "nome": "Trazioni presa neutra",
+      "quando": "dolore",
+      "nota": "Maniglie parallele: più comode per gomito, polso e spalla.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniPresaSupina",
+      "nome": "Trazioni presa supina",
+      "quando": "dolore",
+      "nota": "Palmi verso di te, presa a larghezza spalle; gomiti davanti al busto.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniAssistite",
+      "nome": "Trazioni assistite alla macchina",
+      "quando": "entrambi",
+      "nota": "Il carico è l'assistenza: meno assistenza = più difficile. ROM pieno.",
+      "inc": 5,
+      "kgDa": "da trovare: assistenza minima che dà le ripetizioni previste"
+    }
+  ],
+  "C.trazioni": [
+    {
+      "id": "alt.latMachinePesante",
+      "nome": "Lat machine pesante",
+      "quando": "occupato",
+      "nota": "Barra al petto alto, gomiti verso i fianchi; fasce se gli avambracci cedono.",
+      "inc": 5,
+      "kgDa": "da trovare: circa il peso corporeo meno 15-20 kg"
+    },
+    {
+      "id": "alt.trazioniPresaNeutra",
+      "nome": "Trazioni presa neutra",
+      "quando": "dolore",
+      "nota": "Maniglie parallele: più comode per gomito, polso e spalla.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniPresaSupina",
+      "nome": "Trazioni presa supina",
+      "quando": "dolore",
+      "nota": "Palmi verso di te, presa a larghezza spalle; gomiti davanti al busto.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniAssistite",
+      "nome": "Trazioni assistite alla macchina",
+      "quando": "entrambi",
+      "nota": "Il carico è l'assistenza: meno assistenza = più difficile. ROM pieno.",
+      "inc": 5,
+      "kgDa": "da trovare: assistenza minima che dà le ripetizioni previste"
+    }
+  ],
+  "A.squat": [
+    {
+      "id": "alt.smithSquat",
+      "nome": "Squat alla Smith machine",
+      "quando": "occupato",
+      "nota": "Piedi leggermente avanti, stessa profondità dello squat.",
+      "inc": 5,
+      "kgDa": "≈ 85% del carico dello squat (macchine diverse: riparti dal RIR)"
+    },
+    {
+      "id": "alt.boxSquat",
+      "nome": "Box squat",
+      "quando": "dolore",
+      "nota": "Siediti appena su una panca all'altezza del parallelo, senza rilassarti; tempo lento in discesa.",
+      "inc": 2.5,
+      "kgDa": "≈ 80% del carico dello squat"
+    },
+    {
+      "id": "alt.legPress",
+      "nome": "Leg press",
+      "quando": "entrambi",
+      "nota": "Piedi a metà pedana, scendi senza staccare il bacino dallo schienale.",
+      "inc": 5,
+      "kgDa": "da trovare (non confrontabile: circa 1,5-2 volte il carico dell'hack)"
+    },
+    {
+      "id": "alt.gobletSquat",
+      "nome": "Goblet squat con manubrio",
+      "quando": "occupato",
+      "nota": "Manubrio al petto, gomiti tra le ginocchia, busto alto; tempo lento.",
+      "inc": 2,
+      "kgDa": "il manubrio più pesante che regge 8-12 ripetizioni"
+    }
+  ],
+  "A.hack": [
+    {
+      "id": "alt.legPress",
+      "nome": "Leg press",
+      "quando": "entrambi",
+      "nota": "Piedi a metà pedana, scendi senza staccare il bacino dallo schienale.",
+      "inc": 5,
+      "kgDa": "da trovare (non confrontabile: circa 1,5-2 volte il carico dell'hack)"
+    },
+    {
+      "id": "alt.pendulumSquat",
+      "nome": "Pendulum squat",
+      "quando": "occupato",
+      "nota": "Spalle sotto i cuscinetti, scendi profondo e controllato.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.smithSquat",
+      "nome": "Squat alla Smith machine",
+      "quando": "occupato",
+      "nota": "Piedi leggermente avanti, stessa profondità dello squat.",
+      "inc": 5,
+      "kgDa": "≈ 85% del carico dello squat (macchine diverse: riparti dal RIR)"
+    },
+    {
+      "id": "alt.gobletSquat",
+      "nome": "Goblet squat con manubrio",
+      "quando": "occupato",
+      "nota": "Manubrio al petto, gomiti tra le ginocchia, busto alto; tempo lento.",
+      "inc": 2,
+      "kgDa": "il manubrio più pesante che regge 8-12 ripetizioni"
+    }
+  ],
+  "A.bulgari": [
+    {
+      "id": "alt.affondiIndietro",
+      "nome": "Affondi indietro alternati",
+      "quando": "entrambi",
+      "nota": "Passo lungo indietro, ginocchio dietro quasi a terra; spingi con il piede davanti.",
+      "inc": 2,
+      "kgDa": "≈ 100% del peso dei bulgari"
+    },
+    {
+      "id": "alt.stepUp",
+      "nome": "Step-up su box",
+      "quando": "occupato",
+      "nota": "Box all'altezza del ginocchio, spingi solo con la gamba sopra.",
+      "inc": 2,
+      "kgDa": "≈ 80% del peso dei bulgari"
+    },
+    {
+      "id": "alt.splitSquat",
+      "nome": "Split squat a terra",
+      "quando": "dolore",
+      "nota": "Piede dietro a terra: meno stiramento all'anca della gamba dietro.",
+      "inc": 2,
+      "kgDa": "≈ 100-110% del peso dei bulgari"
+    },
+    {
+      "id": "alt.legPressUnaGamba",
+      "nome": "Leg press a una gamba",
+      "quando": "dolore",
+      "nota": "Niente equilibrio da gestire; ROM fin dove non fa male.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "A.knee": [
+    {
+      "id": "alt.captainsChair",
+      "nome": "Sedia romana (captain's chair)",
+      "quando": "entrambi",
+      "nota": "Avambracci appoggiati: niente presa né spalla appesa. Arrotola il bacino.",
+      "inc": 0,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.crunchInversoPanca",
+      "nome": "Crunch inverso su panca",
+      "quando": "entrambi",
+      "nota": "Mani dietro la testa sulla panca, porta le ginocchia al petto alzando il bacino.",
+      "inc": 0,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.crunchCavo",
+      "nome": "Crunch ai cavi in ginocchio",
+      "quando": "occupato",
+      "nota": "Arrotola la colonna portando i gomiti verso le cosce, anche ferme.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.deadBug",
+      "nome": "Dead bug",
+      "quando": "dolore",
+      "nota": "Schiena bassa premuta a terra, estendi braccio e gamba opposti lentamente.",
+      "inc": 0,
+      "kgDa": "corpo libero (0 kg)"
+    }
+  ],
+  "A.laterali": [
+    {
+      "id": "alt.lateraliCavo",
+      "nome": "Alzate laterali al cavo basso",
+      "quando": "entrambi",
+      "nota": "Una mano alla volta, cavo dietro le gambe; resistenza più dolce in alto.",
+      "inc": 1.25,
+      "kgDa": "≈ 50-60% del peso del manubrio"
+    },
+    {
+      "id": "alt.lateraliMacchina",
+      "nome": "Alzate laterali alla macchina",
+      "quando": "occupato",
+      "nota": "Spalla allineata al perno, gomito guida, niente slancio.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.lateraliSedutoAppoggiato",
+      "nome": "Alzate laterali da seduto, schiena appoggiata",
+      "quando": "dolore",
+      "nota": "Schienale quasi verticale: niente slancio, meno collo.",
+      "inc": 2,
+      "kgDa": "≈ 80-90% del peso in piedi"
+    },
+    {
+      "id": "alt.lateraliPianoScapola",
+      "nome": "Alzate laterali nel piano della scapola fino a 70 gradi",
+      "quando": "dolore",
+      "nota": "Braccia 30 gradi davanti al busto, pollici un po' in su, ti fermi sotto la spalla.",
+      "inc": 2,
+      "kgDa": "≈ 80% del peso abituale"
+    }
+  ],
+  "B.laterali": [
+    {
+      "id": "alt.lateraliCavo",
+      "nome": "Alzate laterali al cavo basso",
+      "quando": "entrambi",
+      "nota": "Una mano alla volta, cavo dietro le gambe; resistenza più dolce in alto.",
+      "inc": 1.25,
+      "kgDa": "≈ 50-60% del peso del manubrio"
+    },
+    {
+      "id": "alt.lateraliMacchina",
+      "nome": "Alzate laterali alla macchina",
+      "quando": "occupato",
+      "nota": "Spalla allineata al perno, gomito guida, niente slancio.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.lateraliSedutoAppoggiato",
+      "nome": "Alzate laterali da seduto, schiena appoggiata",
+      "quando": "dolore",
+      "nota": "Schienale quasi verticale: niente slancio, meno collo.",
+      "inc": 2,
+      "kgDa": "≈ 80-90% del peso in piedi"
+    },
+    {
+      "id": "alt.lateraliPianoScapola",
+      "nome": "Alzate laterali nel piano della scapola fino a 70 gradi",
+      "quando": "dolore",
+      "nota": "Braccia 30 gradi davanti al busto, pollici un po' in su, ti fermi sotto la spalla.",
+      "inc": 2,
+      "kgDa": "≈ 80% del peso abituale"
+    }
+  ],
+  "C.laterali": [
+    {
+      "id": "alt.lateraliCavo",
+      "nome": "Alzate laterali al cavo basso",
+      "quando": "entrambi",
+      "nota": "Una mano alla volta, cavo dietro le gambe; resistenza più dolce in alto.",
+      "inc": 1.25,
+      "kgDa": "≈ 50-60% del peso del manubrio"
+    },
+    {
+      "id": "alt.lateraliMacchina",
+      "nome": "Alzate laterali alla macchina",
+      "quando": "occupato",
+      "nota": "Spalla allineata al perno, gomito guida, niente slancio.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.lateraliSedutoAppoggiato",
+      "nome": "Alzate laterali da seduto, schiena appoggiata",
+      "quando": "dolore",
+      "nota": "Schienale quasi verticale: niente slancio, meno collo.",
+      "inc": 2,
+      "kgDa": "≈ 80-90% del peso in piedi"
+    },
+    {
+      "id": "alt.lateraliPianoScapola",
+      "nome": "Alzate laterali nel piano della scapola fino a 70 gradi",
+      "quando": "dolore",
+      "nota": "Braccia 30 gradi davanti al busto, pollici un po' in su, ti fermi sotto la spalla.",
+      "inc": 2,
+      "kgDa": "≈ 80% del peso abituale"
+    }
+  ],
+  "C.lateraliExtra": [
+    {
+      "id": "alt.lateraliCavo",
+      "nome": "Alzate laterali al cavo basso",
+      "quando": "entrambi",
+      "nota": "Una mano alla volta, cavo dietro le gambe; resistenza più dolce in alto.",
+      "inc": 1.25,
+      "kgDa": "≈ 50-60% del peso del manubrio"
+    },
+    {
+      "id": "alt.lateraliMacchina",
+      "nome": "Alzate laterali alla macchina",
+      "quando": "occupato",
+      "nota": "Spalla allineata al perno, gomito guida, niente slancio.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.lateraliSedutoAppoggiato",
+      "nome": "Alzate laterali da seduto, schiena appoggiata",
+      "quando": "dolore",
+      "nota": "Schienale quasi verticale: niente slancio, meno collo.",
+      "inc": 2,
+      "kgDa": "≈ 80-90% del peso in piedi"
+    },
+    {
+      "id": "alt.lateraliPianoScapola",
+      "nome": "Alzate laterali nel piano della scapola fino a 70 gradi",
+      "quando": "dolore",
+      "nota": "Braccia 30 gradi davanti al busto, pollici un po' in su, ti fermi sotto la spalla.",
+      "inc": 2,
+      "kgDa": "≈ 80% del peso abituale"
+    }
+  ],
+  "D.laterali": [
+    {
+      "id": "alt.lateraliCavo",
+      "nome": "Alzate laterali al cavo basso",
+      "quando": "entrambi",
+      "nota": "Una mano alla volta, cavo dietro le gambe; resistenza più dolce in alto.",
+      "inc": 1.25,
+      "kgDa": "≈ 50-60% del peso del manubrio"
+    },
+    {
+      "id": "alt.lateraliMacchina",
+      "nome": "Alzate laterali alla macchina",
+      "quando": "occupato",
+      "nota": "Spalla allineata al perno, gomito guida, niente slancio.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.lateraliSedutoAppoggiato",
+      "nome": "Alzate laterali da seduto, schiena appoggiata",
+      "quando": "dolore",
+      "nota": "Schienale quasi verticale: niente slancio, meno collo.",
+      "inc": 2,
+      "kgDa": "≈ 80-90% del peso in piedi"
+    },
+    {
+      "id": "alt.lateraliPianoScapola",
+      "nome": "Alzate laterali nel piano della scapola fino a 70 gradi",
+      "quando": "dolore",
+      "nota": "Braccia 30 gradi davanti al busto, pollici un po' in su, ti fermi sotto la spalla.",
+      "inc": 2,
+      "kgDa": "≈ 80% del peso abituale"
+    }
+  ],
+  "A.polpacci": [
+    {
+      "id": "alt.polpacciLegPress",
+      "nome": "Polpacci alla leg press",
+      "quando": "occupato",
+      "nota": "Avampiedi sul bordo basso della pedana, ginocchia quasi tese; pausa in allungamento.",
+      "inc": 5,
+      "kgDa": "≈ 100-120% del carico della macchina per polpacci"
+    },
+    {
+      "id": "alt.polpacciGradino",
+      "nome": "Polpacci in piedi su un gradino",
+      "quando": "occupato",
+      "nota": "Una gamba alla volta con manubrio, pausa di 1-2 secondi in basso.",
+      "inc": 2,
+      "kgDa": "manubrio da 15-25 kg in mano, per gamba"
+    },
+    {
+      "id": "alt.polpacciSmith",
+      "nome": "Polpacci alla Smith machine",
+      "quando": "occupato",
+      "nota": "Rialzo sotto gli avampiedi, niente rimbalzo.",
+      "inc": 5,
+      "kgDa": "≈ 100% del carico della macchina"
+    },
+    {
+      "id": "alt.polpacciSeduto",
+      "nome": "Polpacci da seduto",
+      "quando": "dolore",
+      "nota": "Lavora il soleo; ROM ridotto se il tendine d'Achille dà fastidio.",
+      "inc": 5,
+      "kgDa": "≈ 50-60% del carico della macchina in piedi"
+    }
+  ],
+  "B.panca": [
+    {
+      "id": "alt.chestPress",
+      "nome": "Chest press alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto, scapole strette sullo schienale.",
+      "inc": 5,
+      "kgDa": "da trovare (non confrontabile con i manubri)"
+    },
+    {
+      "id": "alt.pancaManubriPresaNeutra",
+      "nome": "Panca manubri presa neutra",
+      "quando": "dolore",
+      "nota": "Palmi uno verso l'altro, gomiti a 30-45 gradi: meno stress sulla spalla anteriore.",
+      "inc": 2,
+      "kgDa": "≈ 90-100% del peso abituale"
+    },
+    {
+      "id": "alt.pancaBilanciere",
+      "nome": "Panca piana bilanciere",
+      "quando": "occupato",
+      "nota": "Scapole strette e basse, bilanciere al petto basso.",
+      "inc": 2.5,
+      "kgDa": "≈ 2 volte il peso di un manubrio, meno 5-10 kg (es. 20 kg per mano → 30-35 kg)"
+    },
+    {
+      "id": "alt.piegamentiZavorrati",
+      "nome": "Piegamenti (anche zavorrati)",
+      "quando": "occupato",
+      "nota": "Corpo dritto, petto a terra, gomiti a 45 gradi; disco sulla schiena se sono troppo facili.",
+      "inc": 2.5,
+      "kgDa": "corpo libero o con un disco da 10 kg"
+    }
+  ],
+  "C.panca": [
+    {
+      "id": "alt.chestPress",
+      "nome": "Chest press alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto, scapole strette sullo schienale.",
+      "inc": 5,
+      "kgDa": "da trovare (non confrontabile con i manubri)"
+    },
+    {
+      "id": "alt.pancaManubriPresaNeutra",
+      "nome": "Panca manubri presa neutra",
+      "quando": "dolore",
+      "nota": "Palmi uno verso l'altro, gomiti a 30-45 gradi: meno stress sulla spalla anteriore.",
+      "inc": 2,
+      "kgDa": "≈ 90-100% del peso abituale"
+    },
+    {
+      "id": "alt.pancaBilanciere",
+      "nome": "Panca piana bilanciere",
+      "quando": "occupato",
+      "nota": "Scapole strette e basse, bilanciere al petto basso.",
+      "inc": 2.5,
+      "kgDa": "≈ 2 volte il peso di un manubrio, meno 5-10 kg (es. 20 kg per mano → 30-35 kg)"
+    },
+    {
+      "id": "alt.piegamentiZavorrati",
+      "nome": "Piegamenti (anche zavorrati)",
+      "quando": "occupato",
+      "nota": "Corpo dritto, petto a terra, gomiti a 45 gradi; disco sulla schiena se sono troppo facili.",
+      "inc": 2.5,
+      "kgDa": "corpo libero o con un disco da 10 kg"
+    }
+  ],
+  "B.lat": [
+    {
+      "id": "alt.trazioniAssistite",
+      "nome": "Trazioni assistite alla macchina",
+      "quando": "entrambi",
+      "nota": "Il carico è l'assistenza: meno assistenza = più difficile. ROM pieno.",
+      "inc": 5,
+      "kgDa": "da trovare: assistenza minima che dà le ripetizioni previste"
+    },
+    {
+      "id": "alt.latUnBraccioCavoAlto",
+      "nome": "Pulldown a un braccio al cavo alto",
+      "quando": "occupato",
+      "nota": "In ginocchio, tira il gomito verso il fianco; grande allungamento in alto.",
+      "inc": 2.5,
+      "kgDa": "≈ 40-45% del carico della lat machine"
+    },
+    {
+      "id": "alt.latPresaNeutra",
+      "nome": "Lat machine presa neutra",
+      "quando": "dolore",
+      "nota": "Maniglie parallele, gomiti verso i fianchi: più comoda per spalla e gomito.",
+      "inc": 5,
+      "kgDa": "≈ 100% del carico abituale"
+    },
+    {
+      "id": "alt.pulloverCavo",
+      "nome": "Pullover al cavo con corda",
+      "quando": "occupato",
+      "nota": "Braccia quasi tese, porta le mani dalla testa alle cosce; busto fermo.",
+      "inc": 2.5,
+      "kgDa": "≈ 40% del carico della lat machine"
+    }
+  ],
+  "B.tricipiti": [
+    {
+      "id": "alt.estensioniManubrioSopraTesta",
+      "nome": "Estensioni sopra la testa con manubrio",
+      "quando": "entrambi",
+      "nota": "Manubrio a due mani, gomiti stretti; scendi fino al massimo allungamento.",
+      "inc": 2,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.frenchPressInclinata",
+      "nome": "French press su panca inclinata, manubri",
+      "quando": "dolore",
+      "nota": "Braccio meno verticale: meno stress su spalla e gomito.",
+      "inc": 2,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.pushdownCorda",
+      "nome": "Push down corda",
+      "quando": "dolore",
+      "nota": "Gomiti fermi ai fianchi: niente braccio sopra la testa.",
+      "inc": 2.5,
+      "kgDa": "≈ 120% del carico delle estensioni sopra la testa"
+    },
+    {
+      "id": "alt.tricipitiElastico",
+      "nome": "Push down con elastico",
+      "quando": "occupato",
+      "nota": "Elastico fissato in alto, gomiti fermi; serie lunghe.",
+      "inc": 0,
+      "kgDa": "elastico medio, ripetizioni a RIR 1-2"
+    }
+  ],
+  "B.pulley": [
+    {
+      "id": "alt.rematorePettoAppoggiato",
+      "nome": "Rematore manubri con petto appoggiato",
+      "quando": "entrambi",
+      "nota": "Panca inclinata a 30-45 gradi: la schiena bassa è scarica.",
+      "inc": 2,
+      "kgDa": "≈ 70-80% del peso del rematore a un braccio, per mano"
+    },
+    {
+      "id": "alt.rematoreMacchina",
+      "nome": "Rematore alla macchina",
+      "quando": "occupato",
+      "nota": "Petto sul cuscinetto, gomiti indietro, scapole strette in fondo.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.rematoreCavoUnBraccio",
+      "nome": "Rematore al cavo a un braccio",
+      "quando": "occupato",
+      "nota": "Busto fermo, gomito verso l'anca; allungamento completo in avanti.",
+      "inc": 2.5,
+      "kgDa": "≈ 45-50% del carico del pulley"
+    },
+    {
+      "id": "alt.pulleyManigliaLarga",
+      "nome": "Pulley con maniglia larga o due maniglie",
+      "quando": "dolore",
+      "nota": "Niente triangolo contro l'addome; gomiti a 45 gradi.",
+      "inc": 5,
+      "kgDa": "≈ 90% del carico abituale"
+    }
+  ],
+  "B.curl": [
+    {
+      "id": "alt.curlCavoBarra",
+      "nome": "Curl al cavo basso con barra",
+      "quando": "occupato",
+      "nota": "Gomiti fermi ai fianchi, ROM completo.",
+      "inc": 2.5,
+      "kgDa": "≈ 1,5 volte il peso di un manubrio"
+    },
+    {
+      "id": "alt.curlEZ",
+      "nome": "Curl con bilanciere EZ",
+      "quando": "occupato",
+      "nota": "Niente slancio, scendi in 2 secondi.",
+      "inc": 2.5,
+      "kgDa": "≈ 1,6-1,8 volte il peso di un manubrio"
+    },
+    {
+      "id": "alt.curlMacchina",
+      "nome": "Curl alla macchina",
+      "quando": "dolore",
+      "nota": "Braccio appoggiato: meno lavoro per avambraccio e schiena.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.curlMartello",
+      "nome": "Curl martello",
+      "quando": "dolore",
+      "nota": "Presa neutra: più comoda per il polso.",
+      "inc": 2,
+      "kgDa": "≈ 100% del peso del curl"
+    }
+  ],
+  "B.crociInv": [
+    {
+      "id": "alt.rearDeltPancaInclinata",
+      "nome": "Alzate posteriori su panca inclinata",
+      "quando": "occupato",
+      "nota": "Petto appoggiato a 30 gradi, manubri leggeri, braccia quasi tese.",
+      "inc": 1,
+      "kgDa": "manubri da 4-8 kg"
+    },
+    {
+      "id": "alt.crociInverseCavi",
+      "nome": "Croci inverse ai cavi incrociati",
+      "quando": "occupato",
+      "nota": "Cavi all'altezza delle spalle, mani incrociate; apri fino alla linea del busto.",
+      "inc": 1.25,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.facePullSeduto",
+      "nome": "Face pull da seduto",
+      "quando": "occupato",
+      "nota": "Seduto, il corpo resta fermo senza presa dei piedi; corda verso la fronte.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.rearDeltElastico",
+      "nome": "Aperture con elastico (band pull-apart)",
+      "quando": "dolore",
+      "nota": "ROM fino a dove non fa male, lento.",
+      "inc": 0,
+      "kgDa": "elastico leggero, 15-20 ripetizioni"
+    }
+  ],
+  "D.crociInv": [
+    {
+      "id": "alt.rearDeltPancaInclinata",
+      "nome": "Alzate posteriori su panca inclinata",
+      "quando": "occupato",
+      "nota": "Petto appoggiato a 30 gradi, manubri leggeri, braccia quasi tese.",
+      "inc": 1,
+      "kgDa": "manubri da 4-8 kg"
+    },
+    {
+      "id": "alt.crociInverseCavi",
+      "nome": "Croci inverse ai cavi incrociati",
+      "quando": "occupato",
+      "nota": "Cavi all'altezza delle spalle, mani incrociate; apri fino alla linea del busto.",
+      "inc": 1.25,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.facePullSeduto",
+      "nome": "Face pull da seduto",
+      "quando": "occupato",
+      "nota": "Seduto, il corpo resta fermo senza presa dei piedi; corda verso la fronte.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.rearDeltElastico",
+      "nome": "Aperture con elastico (band pull-apart)",
+      "quando": "dolore",
+      "nota": "ROM fino a dove non fa male, lento.",
+      "inc": 0,
+      "kgDa": "elastico leggero, 15-20 ripetizioni"
+    }
+  ],
+  "B.pallof": [
+    {
+      "id": "alt.pallofElastico",
+      "nome": "Pallof press con elastico",
+      "quando": "occupato",
+      "nota": "Elastico fissato a un montante, busto fermo.",
+      "inc": 0,
+      "kgDa": "elastico medio"
+    },
+    {
+      "id": "alt.plankLaterale",
+      "nome": "Plank laterale",
+      "quando": "occupato",
+      "nota": "Gomito sotto la spalla, corpo dritto; secondi al posto delle ripetizioni.",
+      "inc": 0,
+      "kgDa": "corpo libero, 20-40 secondi per lato"
+    },
+    {
+      "id": "alt.deadBug",
+      "nome": "Dead bug",
+      "quando": "dolore",
+      "nota": "Schiena bassa premuta a terra, estendi braccio e gamba opposti lentamente.",
+      "inc": 0,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.pallofInGinocchio",
+      "nome": "Pallof press in mezzo ginocchio",
+      "quando": "dolore",
+      "nota": "Posizione più stabile per la schiena; glutei contratti.",
+      "inc": 2.5,
+      "kgDa": "≈ 80% del carico abituale"
+    }
+  ],
+  "B.crociCavi": [
+    {
+      "id": "alt.inclinataManubri30",
+      "nome": "Panca inclinata manubri a 30 gradi",
+      "quando": "entrambi",
+      "nota": "Scapole strette e basse; manubri al petto alto.",
+      "inc": 2,
+      "kgDa": "da trovare (per mano, circa 70-80% della panca piana)"
+    },
+    {
+      "id": "alt.crociInclinateManubri",
+      "nome": "Croci su panca inclinata con manubri",
+      "quando": "occupato",
+      "nota": "Gomiti leggermente piegati e fissi; allungamento controllato.",
+      "inc": 1,
+      "kgDa": "manubri da 6-10 kg"
+    },
+    {
+      "id": "alt.chestPressInclinata",
+      "nome": "Chest press inclinata alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto alto.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "D.crociCavi": [
+    {
+      "id": "alt.inclinataManubri30",
+      "nome": "Panca inclinata manubri a 30 gradi",
+      "quando": "entrambi",
+      "nota": "Scapole strette e basse; manubri al petto alto.",
+      "inc": 2,
+      "kgDa": "da trovare (per mano, circa 70-80% della panca piana)"
+    },
+    {
+      "id": "alt.crociInclinateManubri",
+      "nome": "Croci su panca inclinata con manubri",
+      "quando": "occupato",
+      "nota": "Gomiti leggermente piegati e fissi; allungamento controllato.",
+      "inc": 1,
+      "kgDa": "manubri da 6-10 kg"
+    },
+    {
+      "id": "alt.chestPressInclinata",
+      "nome": "Chest press inclinata alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto alto.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "C.stacco": [
+    {
+      "id": "alt.staccoDaRialzo",
+      "nome": "Stacco da rialzo (5-10 cm)",
+      "quando": "dolore",
+      "nota": "Bilanciere su dischi o blocchi: partenza più alta se la schiena non tiene la posizione da terra.",
+      "inc": 2.5,
+      "kgDa": "≈ 100% del carico previsto"
+    },
+    {
+      "id": "alt.trapBar",
+      "nome": "Stacco con trap bar",
+      "quando": "entrambi",
+      "nota": "Maniglie alte se c'è: busto più verticale, meno schiena bassa.",
+      "inc": 2.5,
+      "kgDa": "≈ 100-105% del carico dello stacco"
+    },
+    {
+      "id": "alt.staccoAltroBilanciere",
+      "nome": "Stacco con un altro bilanciere da terra o dai pin bassi",
+      "quando": "occupato",
+      "nota": "Stessa tecnica; se usi i pin, la sbarra all'altezza degli stinchi.",
+      "inc": 2.5,
+      "kgDa": "≈ 100% del carico previsto"
+    },
+    {
+      "id": "alt.hipThrust",
+      "nome": "Hip thrust con bilanciere",
+      "quando": "dolore",
+      "nota": "Schiena alta sulla panca, mento basso, spingi con i talloni: schiena bassa scarica.",
+      "inc": 5,
+      "kgDa": "≈ 100% del carico dello stacco"
+    }
+  ],
+  "C.military": [
+    {
+      "id": "alt.shoulderPressMacchina",
+      "nome": "Shoulder press alla macchina",
+      "quando": "occupato",
+      "nota": "Schiena appoggiata, maniglie all'altezza delle spalle.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.militaryInPiedi",
+      "nome": "Military press manubri in piedi",
+      "quando": "occupato",
+      "nota": "Glutei e addome contratti, niente arco della schiena.",
+      "inc": 2,
+      "kgDa": "≈ 90% del peso da seduto"
+    },
+    {
+      "id": "alt.landminePress",
+      "nome": "Landmine press",
+      "quando": "dolore",
+      "nota": "Bilanciere in un angolo, spinta inclinata in avanti: più comoda per la spalla.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.militaryPresaNeutra",
+      "nome": "Military manubri presa neutra",
+      "quando": "dolore",
+      "nota": "Palmi uno verso l'altro, gomiti avanti.",
+      "inc": 2,
+      "kgDa": "≈ 90-100% del peso abituale"
+    }
+  ],
+  "C.rematore": [
+    {
+      "id": "alt.rematorePettoAppoggiato",
+      "nome": "Rematore manubri con petto appoggiato",
+      "quando": "entrambi",
+      "nota": "Panca inclinata a 30-45 gradi: la schiena bassa è scarica.",
+      "inc": 2,
+      "kgDa": "≈ 70-80% del peso del rematore a un braccio, per mano"
+    },
+    {
+      "id": "alt.rematoreCavoUnBraccio",
+      "nome": "Rematore al cavo a un braccio",
+      "quando": "occupato",
+      "nota": "Busto fermo, gomito verso l'anca; allungamento completo in avanti.",
+      "inc": 2.5,
+      "kgDa": "≈ 45-50% del carico del pulley"
+    },
+    {
+      "id": "alt.rematoreMacchina",
+      "nome": "Rematore alla macchina",
+      "quando": "occupato",
+      "nota": "Petto sul cuscinetto, gomiti indietro, scapole strette in fondo.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "C.inclinata": [
+    {
+      "id": "alt.inclinataBilanciere",
+      "nome": "Panca inclinata bilanciere",
+      "quando": "occupato",
+      "nota": "Schienale a 30 gradi, bilanciere al petto alto.",
+      "inc": 2.5,
+      "kgDa": "≈ 2 volte il peso di un manubrio, meno 5-10 kg"
+    },
+    {
+      "id": "alt.chestPressInclinata",
+      "nome": "Chest press inclinata alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto alto.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.inclinataBassa15",
+      "nome": "Panca inclinata bassa (15-20 gradi)",
+      "quando": "dolore",
+      "nota": "Meno flessione della spalla; presa neutra se serve.",
+      "inc": 2,
+      "kgDa": "≈ 100% del peso abituale"
+    },
+    {
+      "id": "alt.crociCaviDalBasso",
+      "nome": "Croci ai cavi dal basso",
+      "quando": "dolore",
+      "nota": "Mani dal basso verso il mento: petto alto con meno carico sulla spalla.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "C.martello": [
+    {
+      "id": "alt.curlCorda",
+      "nome": "Curl al cavo con corda",
+      "quando": "occupato",
+      "nota": "Presa neutra sulla corda, gomiti fermi.",
+      "inc": 2.5,
+      "kgDa": "≈ 1,5 volte il peso di un manubrio"
+    },
+    {
+      "id": "alt.curlEZ",
+      "nome": "Curl con bilanciere EZ",
+      "quando": "occupato",
+      "nota": "Niente slancio, scendi in 2 secondi.",
+      "inc": 2.5,
+      "kgDa": "≈ 1,6-1,8 volte il peso di un manubrio"
+    },
+    {
+      "id": "alt.curlSupinoLeggero",
+      "nome": "Curl con presa supina leggero",
+      "quando": "dolore",
+      "nota": "Per il gomito esterno: carico più basso, niente presa forte.",
+      "inc": 2,
+      "kgDa": "≈ 70% del peso del martello"
+    }
+  ],
+  "C.scrollate": [
+    {
+      "id": "alt.scrollateCavo",
+      "nome": "Scrollate al cavo basso",
+      "quando": "occupato",
+      "nota": "Barra al cavo, sali dritto e pausa in alto.",
+      "inc": 2.5,
+      "kgDa": "≈ 1,5-2 volte il peso di un manubrio"
+    },
+    {
+      "id": "alt.scrollateBilanciere",
+      "nome": "Scrollate con bilanciere",
+      "quando": "occupato",
+      "nota": "Presa a larghezza spalle, niente rotazioni.",
+      "inc": 2.5,
+      "kgDa": "≈ 2 volte il peso di un manubrio"
+    },
+    {
+      "id": "alt.scrollateSmith",
+      "nome": "Scrollate alla Smith machine",
+      "quando": "occupato",
+      "nota": "Sbarra davanti alle cosce, ROM completo.",
+      "inc": 5,
+      "kgDa": "≈ 2 volte il peso di un manubrio"
+    }
+  ],
+  "D.trazAss": [
+    {
+      "id": "alt.latMachineLeggera",
+      "nome": "Lat machine leggera",
+      "quando": "occupato",
+      "nota": "Volume a bassa fatica: RIR 2-3, ROM pieno.",
+      "inc": 5,
+      "kgDa": "≈ 60% del carico della lat machine di B"
+    },
+    {
+      "id": "alt.trazioniPiediAppoggiati",
+      "nome": "Trazioni con piedi appoggiati",
+      "quando": "occupato",
+      "nota": "Sbarra bassa o Smith, talloni su una panca: corpo dritto, petto alla sbarra.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniNegative",
+      "nome": "Trazioni negative lente",
+      "quando": "entrambi",
+      "nota": "Sali con un salto o un gradino, scendi in 3-4 secondi fino a braccia tese.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.trazioniPresaNeutra",
+      "nome": "Trazioni presa neutra",
+      "quando": "dolore",
+      "nota": "Maniglie parallele: più comode per gomito, polso e spalla.",
+      "inc": 2.5,
+      "kgDa": "corpo libero (0 kg)"
+    }
+  ],
+  "D.pulleyStretto": [
+    {
+      "id": "alt.rematoreCavoUnBraccio",
+      "nome": "Rematore al cavo a un braccio",
+      "quando": "occupato",
+      "nota": "Busto fermo, gomito verso l'anca; allungamento completo in avanti.",
+      "inc": 2.5,
+      "kgDa": "≈ 45-50% del carico del pulley"
+    },
+    {
+      "id": "alt.rematorePettoAppoggiato",
+      "nome": "Rematore manubri con petto appoggiato",
+      "quando": "entrambi",
+      "nota": "Panca inclinata a 30-45 gradi: la schiena bassa è scarica.",
+      "inc": 2,
+      "kgDa": "≈ 70-80% del peso del rematore a un braccio, per mano"
+    },
+    {
+      "id": "alt.rematoreMacchina",
+      "nome": "Rematore alla macchina",
+      "quando": "occupato",
+      "nota": "Petto sul cuscinetto, gomiti indietro, scapole strette in fondo.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.pulleyManigliaLarga",
+      "nome": "Pulley con maniglia larga o due maniglie",
+      "quando": "dolore",
+      "nota": "Niente triangolo contro l'addome; gomiti a 45 gradi.",
+      "inc": 5,
+      "kgDa": "≈ 90% del carico abituale"
+    }
+  ],
+  "D.pushdown": [
+    {
+      "id": "alt.pushdownBarra",
+      "nome": "Push down con barra dritta o a V",
+      "quando": "dolore",
+      "nota": "Presa più stabile della corda: spesso più comoda per il gomito.",
+      "inc": 2.5,
+      "kgDa": "≈ 100-110% del carico con la corda"
+    },
+    {
+      "id": "alt.estensioniManubrioSopraTesta",
+      "nome": "Estensioni sopra la testa con manubrio",
+      "quando": "entrambi",
+      "nota": "Manubrio a due mani, gomiti stretti; scendi fino al massimo allungamento.",
+      "inc": 2,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.tricipitiElastico",
+      "nome": "Push down con elastico",
+      "quando": "occupato",
+      "nota": "Elastico fissato in alto, gomiti fermi; serie lunghe.",
+      "inc": 0,
+      "kgDa": "elastico medio, ripetizioni a RIR 1-2"
+    }
+  ],
+  "D.rotazioni": [
+    {
+      "id": "alt.rotazioniElastico",
+      "nome": "Rotazioni esterne con elastico",
+      "quando": "occupato",
+      "nota": "Gomito attaccato al fianco (asciugamano), lento.",
+      "inc": 0,
+      "kgDa": "elastico leggero"
+    },
+    {
+      "id": "alt.rotazioniDecubitoLaterale",
+      "nome": "Rotazioni esterne sdraiato su un fianco",
+      "quando": "entrambi",
+      "nota": "Manubrio leggero, gomito sul fianco, ruota verso l'alto lentamente.",
+      "inc": 1,
+      "kgDa": "manubrio da 2-4 kg"
+    }
+  ],
+  "D.legcurl": [
+    {
+      "id": "alt.legCurlSdraiato",
+      "nome": "Leg curl sdraiato",
+      "quando": "occupato",
+      "nota": "Bacino fermo sul cuscino, ritorno lento.",
+      "inc": 5,
+      "kgDa": "≈ 80-100% del carico del leg curl seduto"
+    },
+    {
+      "id": "alt.legCurlInPiedi",
+      "nome": "Leg curl in piedi a una gamba",
+      "quando": "entrambi",
+      "nota": "Una gamba alla volta, ROM fin dove non fa male.",
+      "inc": 2.5,
+      "kgDa": "≈ 40-50% del carico a due gambe, per gamba"
+    },
+    {
+      "id": "alt.staccoRumenoManubri",
+      "nome": "Stacco rumeno con manubri",
+      "quando": "occupato",
+      "nota": "Ginocchia poco piegate, anche indietro fino a sentire i femorali, schiena neutra.",
+      "inc": 2,
+      "kgDa": "manubri da circa 30-40% del carico dello stacco ciascuno"
+    },
+    {
+      "id": "alt.ponteFemorali",
+      "nome": "Ponte per femorali con talloni su panca",
+      "quando": "dolore",
+      "nota": "Talloni sulla panca, ginocchia poco piegate, alza il bacino; ROM fin dove non tira.",
+      "inc": 0,
+      "kgDa": "corpo libero"
+    }
+  ],
+  "A.legcurl": [
+    {
+      "id": "alt.legCurlSdraiato",
+      "nome": "Leg curl sdraiato",
+      "quando": "occupato",
+      "nota": "Bacino fermo sul cuscino, ritorno lento.",
+      "inc": 5,
+      "kgDa": "≈ 80-100% del carico del leg curl seduto"
+    },
+    {
+      "id": "alt.legCurlInPiedi",
+      "nome": "Leg curl in piedi a una gamba",
+      "quando": "entrambi",
+      "nota": "Una gamba alla volta, ROM fin dove non fa male.",
+      "inc": 2.5,
+      "kgDa": "≈ 40-50% del carico a due gambe, per gamba"
+    },
+    {
+      "id": "alt.staccoRumenoManubri",
+      "nome": "Stacco rumeno con manubri",
+      "quando": "occupato",
+      "nota": "Ginocchia poco piegate, anche indietro fino a sentire i femorali, schiena neutra.",
+      "inc": 2,
+      "kgDa": "manubri da circa 30-40% del carico dello stacco ciascuno"
+    },
+    {
+      "id": "alt.ponteFemorali",
+      "nome": "Ponte per femorali con talloni su panca",
+      "quando": "dolore",
+      "nota": "Talloni sulla panca, ginocchia poco piegate, alza il bacino; ROM fin dove non tira.",
+      "inc": 0,
+      "kgDa": "corpo libero"
+    }
+  ],
+  "C.pushdown": [
+    {
+      "id": "alt.pushdownBarra",
+      "nome": "Push down con barra dritta o a V",
+      "quando": "dolore",
+      "nota": "Presa più stabile della corda: spesso più comoda per il gomito.",
+      "inc": 2.5,
+      "kgDa": "≈ 100-110% del carico con la corda"
+    },
+    {
+      "id": "alt.estensioniManubrioSopraTesta",
+      "nome": "Estensioni sopra la testa con manubrio",
+      "quando": "entrambi",
+      "nota": "Manubrio a due mani, gomiti stretti; scendi fino al massimo allungamento.",
+      "inc": 2,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.tricipitiElastico",
+      "nome": "Push down con elastico",
+      "quando": "occupato",
+      "nota": "Elastico fissato in alto, gomiti fermi; serie lunghe.",
+      "inc": 0,
+      "kgDa": "elastico medio, ripetizioni a RIR 1-2"
+    }
+  ]
+}
