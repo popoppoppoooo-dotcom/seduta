@@ -19,7 +19,14 @@
     // 402: la chiave è valida, ma il suo progetto ha la fatturazione prepagata senza credito
     // (con la fatturazione attiva il livello gratuito non vale più)
     if (stato === 402) return "La chiave funziona, ma è in un progetto Google con fatturazione prepagata e credito finito (402). In AI Studio crea la chiave in un progetto nuovo, senza fatturazione: lì vale il livello gratuito. Intanto usa \"Manda all'app Gemini\".";
-    if (stato === 403) return "Chiave senza permesso per questo modello (403). " + msg;
+    if (stato === 403) {
+      // le cause più comuni, dal testo di Google
+      if (/has not been used|is disabled|SERVICE_DISABLED/i.test(msg)) return "La chiave è in un progetto Google dove l'API Gemini non è attiva (403). Crea la chiave da aistudio.google.com/apikey (\"Create API key in new project\"): lì l'API è già attiva.";
+      if (/referer|referrer|API_KEY_.*BLOCKED|restrict/i.test(msg)) return "La chiave ha delle restrizioni (siti o API consentiti) che bloccano l'app (403). Togli le restrizioni dalla chiave nella console Google, o creane una nuova da AI Studio senza restrizioni.";
+      if (/leaked/i.test(msg)) return "Google ha bloccato questa chiave perché risulta pubblicata da qualche parte (403). Cancellala e creane una nuova in AI Studio, senza incollarla in chat o file condivisi.";
+      if (/suspended|billing/i.test(msg)) return "Il progetto Google della chiave è sospeso o ha un problema di fatturazione (403). Crea la chiave in un progetto nuovo, senza fatturazione.";
+      return "Chiave senza permesso per questo modello (403). Prova \"Trova modelli\" in Altro → Assistente e scegline un altro. Dettaglio di Google: " + msg;
+    }
     if (stato === 404) return "Modello non trovato (404): in Altro → Assistente tocca \"Trova modelli\" e scegline uno.";
     if (stato === 429) return "Quota gratuita esaurita per ora (429): riprova tra qualche minuto, o usa \"Manda all'app Gemini\".";
     if (stato >= 500) return "Il servizio di Google non risponde (" + stato + "): riprova tra poco.";
