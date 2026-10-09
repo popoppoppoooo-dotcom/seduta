@@ -1,4 +1,4 @@
-// Seduta: interfaccia. Dati solo sul telefono (IndexedDB), backup su Drive
+// Work-out (ex Seduta): interfaccia. Dati solo sul telefono (IndexedDB), backup su Drive
 // tramite il pannello "Condividi" di Android.
 (function () {
   "use strict";
@@ -714,8 +714,8 @@
       <li>Impostazioni → Sicurezza e privacy → Altre impostazioni di sicurezza → <b>Blocco app</b> (o "Fissa app"): attivalo.</li>
       <li>Attiva anche <b>"Chiedi il PIN prima di sbloccare"</b>.</li></ol></div>
       <div class="card"><b>In palestra</b><ol style="font-size:15px;padding-left:20px">
-      <li>Apri Seduta.</li><li>Tocca il pulsante delle app recenti (o scorri dal basso e fermati).</li><li>Tocca l'icona di Seduta in alto → <b>Blocca</b>.</li></ol>
-      <p class="tenue" style="font-size:14px">Il telefono resta su Seduta: niente notifiche, niente altre app. Per uscire: tieni premuti indietro + recenti (o scorri in su e tieni premuto) e metti il PIN. Il PIN è la frizione che ti fa fermare un secondo.</p></div>
+      <li>Apri Work-out.</li><li>Tocca il pulsante delle app recenti (o scorri dal basso e fermati).</li><li>Tocca l'icona di Work-out in alto → <b>Blocca</b>.</li></ol>
+      <p class="tenue" style="font-size:14px">Il telefono resta su Work-out: niente notifiche, niente altre app. Per uscire: tieni premuti indietro + recenti (o scorri in su e tieni premuto) e metti il PIN. Il PIN è la frizione che ti fa fermare un secondo.</p></div>
       <div class="card"><b>In più</b><p style="font-size:14px">Modalità Non disturbare programmata negli orari della palestra (Impostazioni → Notifiche → Non disturbare → Pianificazioni).</p></div>`;
   }
 
@@ -743,7 +743,7 @@
   async function importa(file) {
     let d;
     try { d = JSON.parse(await file.text()); } catch (_) { return toast("File non valido."); }
-    if (d.app !== "seduta") return toast("Non è un backup di Seduta.");
+    if (d.app !== "seduta") return toast("Non è un backup di Work-out.");
     const n = { sedute: 0, corpo: 0, foto: 0, chat: 0 };
     for (const s of d.sedute || []) { await DB.metti("sedute", s); n.sedute++; }
     for (const c of d.corpo || []) { await DB.metti("corpo", c); n.corpo++; }

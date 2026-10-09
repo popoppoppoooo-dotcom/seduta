@@ -1,6 +1,6 @@
 # Sapere del coach palestra
 
-Base di conoscenza per l'assistente dell'app "Seduta". È generica: niente dati
+Base di conoscenza per l'assistente dell'app "Work-out" (ex Seduta). È generica: niente dati
 personali (quelli sono in un file separato). Vale per il programma di 16
 settimane con schede A, B, C, D descritto in `programma.js`. Scritta l'8-9
 ottobre 2026 con verifica delle fonti principali.

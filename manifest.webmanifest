@@ -1,6 +1,6 @@
 {
-  "name": "Seduta",
-  "short_name": "Seduta",
+  "name": "Work-out",
+  "short_name": "Work-out",
   "description": "Registro della palestra con carichi previsti e coach",
   "start_url": "./#oggi",
   "scope": "./",
