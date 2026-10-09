@@ -92,6 +92,19 @@ Se due livelli sono in conflitto, vince quello più in alto, e lo dici in una ri
   bilanciere vicino alle gambe e la schiena in posizione, e non deve arrivare
   allo stacco già stanco. Superserie solo sugli accessori, mai su squat, stacco
   e trazioni.
+- Volume settimanale (dal 9 ottobre 2026, settimana 7): l'utente ha gambe già
+  grosse e vuole l'estetica della parte alta. Serie dirette a settimana (senza
+  D): quadricipiti 6 (squat 4, hack 2), femorali circa 8 (leg curl 3, stacco 3,
+  iperestensioni 2), polpacci 2; petto 10 (panca B 4, inclinata 30° in C 3,
+  croci ai cavi 3); dorso 19 (trazioni 12, lat 2, pulley 2, rematore 3);
+  deltoidi laterali 14 (4 + 4 + 3 + 3 extra in C); posteriori 3; bicipiti 8
+  (curl 3, martello 3, curl ai cavi in A 2); tricipiti 7 (sopra la testa 3,
+  push down corda in C 2, pushdown barra in A 2). Prima: quadricipiti 7, petto
+  10 sulla piana, dorso 21, laterali 12, bicipiti 6, tricipiti 3. Parere di
+  Gemini accettato in parte: tagli a hack, lat, pulley e braccia a 7-8 serie
+  sì; laterali a 15 e 4 serie di inclinata no (tempo della seduta). Da
+  rivedere con le foto e le misure del 12 ottobre; se le braccia restano
+  indietro dopo 4 settimane, +1 serie per esercizio.
 - Settimane a onda (dal 9 ottobre 2026, settimane 7-14): settimane di forza
   (F: 7, 9, 11, 13) e di ipertrofia (I: 8, 10, 14) alternate. Nelle F la seduta
   B si apre con la panca manubri pesante (B.pancaF, 4 x 5-6, RIR almeno 2,
@@ -420,6 +433,11 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
   Ultima serie: se la tecnica cambia (anche, ginocchia) è RIR 0 anche se sei
   salito.
 
+### Curl ai cavi e pushdown barra (A.curlCavi, A.pushBarra, dalla settimana 7)
+- Superserie 2 + 2 in fondo ad A, 10-12, per portare le braccia a 7-8 serie
+  dirette a settimana. Gomiti fermi ai fianchi; nessun cedimento con slancio.
+  Carico da trovare alla prima seduta.
+
 ### Hack squat (A.hack)
 - Muscoli: quadricipiti soprattutto, glutei; la schiena è scarica.
 - Come si segna il carico: il totale dei dischi dei due lati, slitta esclusa
@@ -614,7 +632,7 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
   aiuto = RIR 0-1. Se gli avambracci sono saturi dalle tirate precedenti, la
   presa supina fissa è il cambio più semplice.
 
-### Croci inverse (B.crociInv, D.crociInv)
+### Croci inverse (B.crociInv ai cavi, D.crociInv)
 - Muscoli: deltoide posteriore, trapezio medio, romboidi.
 - Esecuzione (macchina, reverse pec deck): petto appoggiato, maniglie
   all'altezza delle spalle, presa neutra o prona; braccia quasi tese, apri
@@ -783,7 +801,7 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
   macchina per rematore.
 - RIR: in D resta a RIR 2-3 (seduta a bassa fatica).
 
-### Push down corda (D.pushdown; C.pushdown 2 x 10-15 dalla settimana 10)
+### Push down corda (D.pushdown; C.pushdown 2 x 10-15 dalla settimana 7)
 - Muscoli: tricipite, soprattutto capo laterale e mediale.
 - Esecuzione: cavo alto con corda; gomiti fermi ai fianchi; estendi
   completamente aprendo leggermente la corda in basso; risali fino a circa 90
@@ -842,6 +860,12 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
 - Cavo occupato: elastico fissato a un montante, plank laterale, dead bug.
 - RIR: il busto comincia a ruotare = fine serie.
 - Dalla settimana 7 è sostituito dalle croci ai cavi dal basso in B.
+
+### Panca inclinata manubri 30° (C.inclinata30, dalla settimana 7)
+- Al posto della panca piana di C dal 9 ottobre 2026: petto alto per
+  l'estetica, la piana resta in B (dove c'è il test 28 x 8). 3 x 8-10,
+  partenza 20 kg. Panca a 30 gradi, non 45: a 45 lavora soprattutto la
+  spalla. Tecnica e dolori come la panca piana.
 
 ### Panca inclinata manubri (C.inclinata, fino alla settimana 6)
 - Muscoli: grande pettorale, soprattutto il fascio clavicolare, deltoide

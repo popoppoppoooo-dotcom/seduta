@@ -699,12 +699,12 @@
       "kgDa": "manubri da 4-8 kg"
     },
     {
-      "id": "alt.crociInverseCavi",
-      "nome": "Croci inverse ai cavi incrociati",
+      "id": "alt.crociInvMacchina",
+      "nome": "Croci inverse macchina (pec deck al contrario)",
       "quando": "occupato",
-      "nota": "Cavi all'altezza delle spalle, mani incrociate; apri fino alla linea del busto.",
-      "inc": 1.25,
-      "kgDa": "da trovare"
+      "nota": "Petto contro lo schienale, braccia quasi tese, apri fino alla linea delle spalle.",
+      "inc": 2.5,
+      "kgDa": "da trovare (non confrontabile con i cavi)"
     },
     {
       "id": "alt.facePullSeduto",
@@ -1253,6 +1253,68 @@
       "nota": "Palmi uno verso l'altro, gomiti a 30-45 gradi: meno stress sulla spalla anteriore.",
       "inc": 2,
       "kgDa": "≈ 90-100% del peso abituale"
+    }
+  ],
+  "C.inclinata30": [
+    {
+      "id": "alt.inclinataBilanciere30",
+      "nome": "Panca inclinata bilanciere",
+      "quando": "occupato",
+      "nota": "Schienale a 30 gradi, bilanciere al petto alto.",
+      "inc": 2.5,
+      "kgDa": "≈ 2 volte il peso di un manubrio, meno 5-10 kg"
+    },
+    {
+      "id": "alt.chestPressInclinata30",
+      "nome": "Chest press inclinata alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto alto.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.inclinataBassa1530",
+      "nome": "Panca inclinata bassa (15-20 gradi)",
+      "quando": "dolore",
+      "nota": "Meno flessione della spalla; presa neutra se serve.",
+      "inc": 2,
+      "kgDa": "≈ 100% del peso abituale"
+    },
+    {
+      "id": "alt.crociCaviDalBasso30",
+      "nome": "Croci ai cavi dal basso",
+      "quando": "dolore",
+      "nota": "Mani dal basso verso il mento: petto alto con meno carico sulla spalla.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "A.curlCavi": [
+    {
+      "id": "alt.curlManubriA",
+      "nome": "Curl manubri alternato",
+      "quando": "occupato",
+      "nota": "Gomiti fermi, niente slancio.",
+      "inc": 2,
+      "kgDa": "da trovare"
+    }
+  ],
+  "A.pushBarra": [
+    {
+      "id": "alt.pushCordaA",
+      "nome": "Push down corda",
+      "quando": "occupato",
+      "nota": "Gomiti fermi ai fianchi.",
+      "inc": 2.5,
+      "kgDa": "come il push down di C"
+    },
+    {
+      "id": "alt.dipsPanca",
+      "nome": "Dip tra due panche",
+      "quando": "occupato",
+      "nota": "Spalle basse, scendi fino a gomiti a 90 gradi; se la spalla davanti tira, usa il push down.",
+      "inc": 0,
+      "kgDa": "corpo libero"
     }
   ]
 }

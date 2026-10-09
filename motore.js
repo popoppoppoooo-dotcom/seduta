@@ -285,15 +285,14 @@
       rips = Array(serieN).fill(range[0]);
     } else {
       const pianoN = u.ripTarget ? u.ripTarget.length : def.serie;
-      // per salire serve almeno il RIR dell'ultima serie (la più dura)
-      // dal taccuino (seduta iniziale) il RIR non c'è: si assume 2, quello previsto allora
-      const ultimaRir = set.length ? set[set.length - 1].rir ?? (u.iniziale ? 2 : null) : null;
+      // il RIR è facoltativo (dal 9 ottobre 2026): se manca si assume 2, come nel taccuino.
+      // Se c'è, aiuta: RIR 0 sull'ultima serie blocca la salita, RIR 4 sulla prima la accelera.
+      const ultimaRir = set.length ? set[set.length - 1].rir ?? 2 : null;
       // serie più leggere solo come avvicinamento (prima del carico pieno), non come scalo dopo;
       // una serie tentata più pesante non blocca la salita
       const iKu = set.findIndex(s => (s.kg ?? ku) === ku);
       const scalo = set.some((s, i) => i > iKu && (s.kg ?? ku) < ku);
       const tutteInCima = set.length >= Math.min(pianoN, def.serie) && ultimaRir != null && !scalo && set.every(s => (s.kg ?? ku) !== ku || (s.rip >= range[1] && (s.rir == null || s.rir >= 1)));
-      const inCimaSenzaRir = ultimaRir == null && set.length && set.every(s => s.rip >= range[1]);
       const primaFacile = def.id !== "B.panca" && set[0] && set[0].rip >= range[1] && set[0].rir != null && set[0].rir >= 4 && (set[0].kg ?? ku) >= ku;
       const tutteSotto = set.every(s => s.rip < range[0]);
       if (kAlto > kMod && !def.legatoA) {
@@ -321,9 +320,7 @@
           const prec = set[Math.min(i, set.length - 1)].rip;
           rips.push(Math.min(range[1], Math.max(range[0], prec + 1)));
         }
-        motivo = inCimaSenzaRir
-          ? `Ultima volta tutte in cima ma senza RIR: ripeti ${fmtKg(ku)} kg e segna il RIR dell'ultima serie per poter salire.`
-          : `Stesso carico: prova ad aggiungere una ripetizione per serie (ultima volta ${set.map(s => s.rip).join("/")}).`;
+        motivo = `Stesso carico: prova ad aggiungere una ripetizione per serie (ultima volta ${set.map(s => s.rip).join("/")}).`;
       }
     }
     if (leggero) {
