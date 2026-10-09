@@ -70,7 +70,9 @@ Se due livelli sono in conflitto, vince quello più in alto, e lo dici in una ri
 ## B. Regole di progressione del programma
 
 ### Struttura
-- 16 settimane. Settimana 1 = lunedì 31 agosto 2026. La settimana corrente si
+- Settimane 1-16 (fino al test di dicembre), poi la scheda continua da sola
+  fino alla settimana 94 (giugno 2028): vedi "Dopo la settimana 16".
+  Settimana 1 = lunedì 31 agosto 2026. La settimana corrente si
   calcola dalla data: `n = floor((oggi - 31/08/2026) / 7) + 1`.
 - Blocchi: Base (1-5), Deload (6), Forza (7-11), Deload (12), Picco (13-14),
   Taper (15), Test (16, 14-19 dicembre).
@@ -92,19 +94,25 @@ Se due livelli sono in conflitto, vince quello più in alto, e lo dici in una ri
   bilanciere vicino alle gambe e la schiena in posizione, e non deve arrivare
   allo stacco già stanco. Superserie solo sugli accessori, mai su squat, stacco
   e trazioni.
-- Volume settimanale (dal 9 ottobre 2026, settimana 7): l'utente ha gambe già
-  grosse e vuole l'estetica della parte alta. Serie dirette a settimana (senza
-  D): quadricipiti 6 (squat 4, hack 2), femorali circa 8 (leg curl 3, stacco 3,
-  iperestensioni 2), polpacci 2; petto 10 (panca B 4, inclinata 30° in C 3,
-  croci ai cavi 3); dorso 19 (trazioni 12, lat 2, pulley 2, rematore 3);
-  deltoidi laterali 14 (4 + 4 + 3 + 3 extra in C); posteriori 3; bicipiti 8
-  (curl 3, martello 3, curl ai cavi in A 2); tricipiti 7 (sopra la testa 3,
-  push down corda in C 2, pushdown barra in A 2). Prima: quadricipiti 7, petto
-  10 sulla piana, dorso 21, laterali 12, bicipiti 6, tricipiti 3. Parere di
-  Gemini accettato in parte: tagli a hack, lat, pulley e braccia a 7-8 serie
-  sì; laterali a 15 e 4 serie di inclinata no (tempo della seduta). Da
-  rivedere con le foto e le misure del 12 ottobre; se le braccia restano
-  indietro dopo 4 settimane, +1 serie per esercizio.
+- Volume settimanale (rivisto il 9 ottobre 2026, sera, dalla settimana 7):
+  priorità estetica dell'utente: braccia, spalle rotonde, petto, addome; gambe
+  già grosse. Criterio: beneficio marginale di ogni serie in più (curva dose-
+  risposta che si appiattisce sopra 10-20 serie dirette, con le serie
+  indirette contate a metà), pesato per priorità. Serie dirette a settimana
+  (senza D): petto 13 (panca B 4, croci ai cavi 3, inclinata 30° in A 3 al
+  posto dell'hack, inclinata 30° in C 3); deltoidi laterali 14 (4 + 4 + 3 + 3
+  extra in C); tricipiti 9 (sopra la testa 4, push down corda in C 3,
+  pushdown barra in A 2); bicipiti 7 (curl 3, curl ai cavi 2, martello 2);
+  addome 4 (knee raise 2, crunch ai cavi 2 in B, in superserie con le croci);
+  quadricipiti 4 (squat, scelta dell'utente); femorali leg curl 3 + stacco o
+  rumeno 3 + iperestensioni 2; polpacci 2 (l'utente li tiene); dorso:
+  trazioni 12, lat 2, pulley 2, rematore 3; military 2 (dopo l'inclinata: i
+  deltoidi anteriori lavorano già in tutte le spinte).
+  Laterali più del petto è voluto: muscolo piccolo, recupera presto, quasi
+  nessun lavoro indiretto e la leva principale per spalle larghe e rotonde.
+  Addome: chi è magro lo vede già; squat e stacco lo attivano poco (lavoro
+  isometrico, non a pieno allungamento), quindi 4 serie dirette con carico
+  progressivo bastano per ispessirlo, non di più.
 - Settimane a onda (dal 9 ottobre 2026, settimane 7-14): settimane di forza
   (F: 7, 9, 11, 13) e di ipertrofia (I: 8, 10, 14) alternate. Nelle F la seduta
   B si apre con la panca manubri pesante (B.pancaF, 4 x 5-6, RIR almeno 2,
@@ -121,17 +129,49 @@ Se due livelli sono in conflitto, vince quello più in alto, e lo dici in una ri
   sull'ultima serie di un isolamento, dal blocco Forza. Mai in deload, taper,
   test; stop dalla settimana 14.
 
+### Dopo la settimana 16: la scheda cambia da sola (dal 9 ottobre 2026)
+- Ponte di viaggio, settimane 17-22 (21 dicembre 2026 - 31 gennaio 2027):
+  2 sedute a settimana (A e C, con dentro gli esercizi chiave di B), circa 2/3
+  delle serie, RIR 2-3, squat 3 x 5 e stacco 2 x 5 al 79% del massimale
+  stimato. Se manca l'attrezzo si usa un'alternativa (storia propria).
+- Dalla settimana 23 (1° febbraio 2027) cicli da 6 settimane fino alla 94:
+  Accumulo (4 x 6, poi 4 x 5), Intensificazione (4 x 4), Picco (4 x 3, test
+  trazioni in B), Scarico (2 x 4). Accessori: 10-15 e RIR 2-3
+  nell'accumulo, 8-12 nell'intensificazione, 6-10 nel picco. Stacco rumeno
+  nelle settimane I.
+- Carichi di squat e stacco nei cicli: percentuale (formula di Epley con RIR)
+  del massimale stimato dalle serie da 6 ripetizioni o meno del ciclo
+  precedente (ultime 6 settimane, scarichi esclusi), meno il 5% di margine.
+  Se nel ciclo precedente non c'è bilanciere (viaggio), usa gli ultimi dati
+  con un altro 10% in meno. Lo scarto dalla tabella non passa da un ciclo
+  all'altro. Ultima serie a RIR 4 o più (scritto dall'utente): +1 incremento
+  in più la volta dopo.
+- Tetti (`tetti` in programma.js): squat 122,5 x 3. Raggiunto, mantenimento
+  con 3 serie e carico fermo; le serie liberate vanno alla parte alta.
+- Obiettivi con `passo`: raggiunti, salgono di un gradino (stacco +5 kg,
+  panca +2, alzate +2) e la scheda Obiettivi mostra il nuovo.
+- Trazioni: tetto della scala = 3/4 dell'ultimo massimale. Con 12 al test,
+  dal ciclo dopo trazioni zavorrate 4 x 5-8 (doppia progressione, si parte
+  da 2,5 kg).
+- Frequenza: se le 2 settimane precedenti hanno avuto 1-2 sedute ciascuna,
+  l'app propone la versione da 2 sedute (A e C) senza aspettare la settimana
+  corta; con 3 sedute in una settimana torna normale. Una settimana vuota è
+  una pausa, non conta.
+- Palestra nuova (Altro): da quella data gli esercizi `macchina: true`
+  (macchine e cavi) ripartono senza storia; bilancieri e manubri no.
+
 ### Squat e stacco: il calendario è una traiettoria
 - X e Y sono i carichi di riferimento trovati nel test della settimana 1:
   il carico che dà 5 ripetizioni pulite a RIR 2 circa.
 - Ogni settimana il calendario dà serie x ripetizioni e un incremento rispetto
-  a X o Y. Squat: da 3 x 5 X (settimana 2) a X+30 x 3 (test). Stacco: dal 9
-  ottobre 2026 la tabella riparte da 90 kg (il carico reale della settimana 5)
-  e sale di 2,5 kg a settimana: 3 x 4 a 92,5 nella settimana 7, test 115 x 3
-  nella 16 (120 se la schiena resta a 0-1 su 10). Un obiettivo più basso
-  fatto bene vale più di uno alto fatto con dolore. Rialzarlo è una decisione
-  dell'utente, solo con schiena a 0-1 su 10 per almeno 3 settimane (il motivo
-  della scelta è nel profilo privato).
+  a X o Y. Squat: da 3 x 5 X (settimana 2) a X+30 x 3 (test). Squat: 4 serie
+  fino al test, tetto 122,5 x 3 (scelta dell'utente): oltre, mantenimento con
+  3 serie. Stacco da terra solo nelle settimane di forza (7, 9, 11, 13, +5 kg
+  ogni volta, a settimane alterne è la norma), stacco rumeno (C.rdl, 3 x 6-8,
+  RIR 2) nelle altre (8, 10, 12, 14), con 2 x 3 leggeri da terra nel
+  riscaldamento per non perdere la partenza dal pavimento (parere di Gemini).
+  Rifinitura 15, test 115 x 3 nella 16. L'utente preferisce allenare con
+  l'esercizio migliore e testare lo stacco vero a dicembre.
 - Regola settimanale, dopo la seduta:
   1. Tutte le serie al RIR previsto, tecnica stabile: la volta dopo segui il
      calendario.
@@ -152,11 +192,8 @@ Se due livelli sono in conflitto, vince quello più in alto, e lo dici in una ri
   di lavoro e solo dopo un 3 x 5 pulito senza.
 - Squat: profondità uguale su tutte, almeno parallelo (piega dell'anca all'altezza
   del ginocchio o sotto).
-- Squat, tetto di prudenza: 110 x 5 era già "non pulitissimo" (settimana 5).
-  Se la tecnica peggiora ancora prima della settimana 10 (busto che si piega
-  in avanti, "good morning squat", che carica la schiena già dolorante nello
-  stacco), lo squat si ferma a 120-122,5 e l'obiettivo di 130 va rivisto
-  (lo decide l'utente).
+- Squat, tecnica: se il busto si piega in avanti ("good morning squat"), il
+  carico non sale finché la posizione non torna stabile.
 - Pulsante "Dolore" su squat e stacco: si tocca se durante l'esercizio la
   schiena (o un'articolazione) fa male. La volta dopo l'app scende di un
   incremento rispetto all'ultimo carico. Regola del dolore: fino a 3 su 10 e
@@ -305,9 +342,9 @@ Se due livelli sono in conflitto, vince quello più in alto, e lo dici in una ri
 - Taper (settimana 15): metà volume, carichi ancora alti (squat 2 x 3, stacco
   2 x 3), RIR 2-3, niente cedimento, niente salti. Serve ad arrivare al test
   senza fatica residua.
-- Test (settimana 16): lunedì A (squat 130 x 3), martedì B (prima panca
+- Test (settimana 16): lunedì A (squat 122,5 x 3), martedì B (prima panca
   manubri 28 x 8, poi trazioni al massimo, il resto leggero a RIR 3-4), giovedì
-  C (stacco 115 x 3, 120 se la schiena resta a 0-1 su 10, e alzate laterali
+  C (stacco 115 x 3 e alzate laterali
   14 x 12). Un solo tentativo per test. Se manchi, non ripetere lo stesso
   giorno. Il carico del tentativo che l'app propone è il più basso tra il
   calendario e la stima dall'e1RM migliore delle 3 settimane prima (escluso il
@@ -649,6 +686,17 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
   RIR 0-1. Esercizio a ripetizioni alte: range 12-15 in B (dal 9 ottobre
   2026; prima 15-20 non era realistico al carico minimo della macchina).
 
+### Crunch ai cavi in ginocchio (B.crunch, dalla settimana 7)
+- In superserie con le croci ai cavi. Muscoli: retto dell'addome con carico
+  vero (squat e stacco lo usano poco e solo in isometria).
+- Esecuzione: in ginocchio davanti al cavo alto, corda ai lati della testa;
+  arrotola la colonna portando i gomiti verso le cosce, anca ferma. Espira
+  scendendo.
+- Carico: 2 x 10-15, RIR 1-2, doppia progressione (+2,5 kg). Il carico conta:
+  serve a ispessire l'addome come per gli altri muscoli.
+- Errori: sedersi sui talloni tirando con le braccia (diventa un movimento
+  d'anca).
+
 ### Croci ai cavi dal basso (B.crociCavi dalla settimana 7, D.crociCavi)
 - Muscoli: grande pettorale, soprattutto il fascio clavicolare (petto alto),
   deltoide anteriore.
@@ -666,7 +714,7 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
 - RIR: le mani non arrivano più a incontrarsi in alto o compare spinta con le
   braccia = RIR 0-1.
 
-### Stacco da terra (C.stacco)
+### Stacco da terra (C.stacco, settimane 7, 9, 11, 13 e test)
 - Muscoli: glutei, femorali, quadricipiti nella partenza, erettori della
   colonna (isometrici), dorsali, trapezi, presa.
 - Esecuzione: bilanciere sopra il centro del piede, a 2-3 cm dagli stinchi;
@@ -702,6 +750,20 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
   gambe = RIR 0, anche se la ripetizione sale. Velocità: la parte più lenta è
   la partenza; se la sbarra "si incolla" a terra per un attimo, sei a RIR 0-1.
   Filmati di lato sulla seconda serie per controllare.
+
+### Stacco rumeno (C.rdl, settimane 8, 10, 12, 14 e nei cicli)
+- Muscoli: femorali e glutei in allungamento; schiena bassa in isometria.
+- Esecuzione: parti in piedi con il bilanciere (dai supporti o dopo uno stacco),
+  ginocchia appena piegate e ferme, spingi l'anca indietro e fai scorrere la
+  sbarra lungo le cosce; scendi finché i femorali tirano (di solito sotto il
+  ginocchio, metà tibia) con la schiena neutra, poi risali spingendo l'anca
+  avanti. Niente rimbalzo in basso, il bilanciere non tocca terra.
+- Carico: 3 x 6-8, RIR almeno 2, doppia progressione (+2,5 kg). Prima, nel
+  riscaldamento, 2 x 3 di stacco da terra leggero (60-70% del pesante).
+- Errori: piegare le ginocchia (diventa uno stacco), arrotondare la schiena
+  per scendere di più, guardare in alto.
+- Dolore: schiena bassa -> ROM ridotto, carico più basso, o alternative
+  (iperestensioni con disco, pull-through al cavo).
 
 ### Iperestensioni 45 gradi (C.iper)
 - Perché: rinforzano glutei, femorali ed erettori a carico basso, alla fine di
@@ -861,7 +923,9 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
 - RIR: il busto comincia a ruotare = fine serie.
 - Dalla settimana 7 è sostituito dalle croci ai cavi dal basso in B.
 
-### Panca inclinata manubri 30° (C.inclinata30, dalla settimana 7)
+### Panca inclinata manubri 30° (C.inclinata30 e A.inclinata30, dalla settimana 7)
+- In A prende il posto dell'hack squat, dopo lo squat; storia separata da C.
+  In C viene prima del military.
 - Al posto della panca piana di C dal 9 ottobre 2026: petto alto per
   l'estetica, la piana resta in B (dove c'è il test 28 x 8). 3 x 8-10,
   partenza 20 kg. Panca a 30 gradi, non 45: a 45 lavora soprattutto la

@@ -64,6 +64,9 @@
       // settimane a onda: onda "F" = solo nelle settimane di forza, "I" = in tutte le altre
       if (e.onda === "F" && w.onda !== "F") return false;
       if (e.onda === "I" && w.onda === "F") return false;
+      // se / tranneSe: l'esercizio c'è solo nelle settimane con (o senza) quel segno, es. "rdl"
+      if (e.se && !w[e.se]) return false;
+      if (e.tranneSe && w[e.tranneSe]) return false;
       if (e.tipo === "salti") {
         if (!w.salti) return false;
         if (e.id.endsWith("balzi") && !w.balzi) return false;
@@ -101,29 +104,68 @@
   };
 
   // ---------- bilanciere (squat, stacco) ----------
-  function kgTabella(P, lift, n) {
+  function idsLift(P, lift) {
+    const out = [];
+    for (const L of Object.keys(P.sedute)) for (const e of P.sedute[L].esercizi) if (e.tipo === "bilanciere" && e.lift === lift) out.push(e.id);
+    return out;
+  }
+  // Cicli dopo dicembre (settimane con pct): i carichi sono una percentuale del massimale
+  // stimato dalle serie fino a 6 ripetizioni delle 6 settimane prima del ciclo (il ciclo
+  // precedente), meno il 5%: la formula da poche ripetizioni sovrastima il lavoro a 5-6.
+  // Sopra il tetto (es. squat 122,5 × 3) si ferma.
+  function rifCiclo(P, lift, cicloN, storico) {
+    const h = storia(storico || [], idsLift(P, lift)).filter(e => e.sett < cicloN && !e.deload);
+    const finestra = h.filter(e => e.sett >= cicloN - 6);
+    const usa = finestra.length ? finestra : h.slice(0, 2);
+    let e1 = 0;
+    for (const e of usa) for (const s of fatte(e)) if (s.kg && s.rip > 0 && s.rip <= 6) e1 = Math.max(e1, e1rm(s.kg, s.rip, s.rir));
+    const pausa = !finestra.length && e1 > 0;
+    if (!e1) e1 = e1rm(P.base[lift], 5, 2);
+    const t = P.tetti && P.tetti[lift];
+    const cap = t ? e1rm(t.kg, t.rip, 0) : Infinity;
+    // tetto raggiunto solo con una serie vera (la stima dalla formula può gonfiare)
+    const tetto = !!t && h.some(e => fatte(e).some(s => s.kg >= t.kg && s.rip >= t.rip));
+    e1 *= pausa ? 0.9 * 0.95 : 0.95; // margine del 5%; dopo una pausa lunga si riparte più bassi
+    return { e1: Math.min(e1, cap * 0.95), tetto, pausa };
+  }
+  function kgTabella(P, lift, n, storico) {
     const w = settimana(P, n);
     if (!w || !Array.isArray(w[lift])) return null;
+    if (w.pct) return giu(rifCiclo(P, lift, w.cicloN, storico).e1 * w[lift][2], 2.5);
     return P.base[lift] + w[lift][2];
   }
   function pianoBilanciere(P, def, w, storico, primaDi) {
     const cal = w[def.lift];
     if (!Array.isArray(cal)) return { kg: null, rip: [5], rir: [0, 1], range: [5, 5], motivo: "Settimana di test: trova il carico massimo per 5." };
-    const serieN = cal[0], rip = cal[1];
-    const tab = kgTabella(P, def.lift, w.n);
+    let serieN = cal[0];
+    const rip = cal[1];
+    const tab = kgTabella(P, def.lift, w.n, storico);
+    // tetto raggiunto (es. squat): mantenimento, meno serie, il carico non sale oltre
+    const rif = w.pct ? rifCiclo(P, def.lift, w.cicloN, storico) : null;
+    const tettoL = P.tetti && P.tetti[def.lift];
+    const mant = rif && rif.tetto && tettoL ? `Tetto raggiunto (${fmtKg(tettoL.kg)} × ${tettoL.rip}): mantenimento, ${Math.min(serieN, tettoL.serie || 3)} serie. ` : "";
+    if (mant) serieN = Math.min(serieN, tettoL.serie || 3);
     const h = storia(storico, [def.id], primaDi);
     let kg = tab, motivo = `Tabella: ${fmtKg(tab)} kg.`;
     const u = h[0];
-    if (u) {
+    // ciclo nuovo: schema di ripetizioni diverso, si riparte dalla percentuale del massimale
+    const nuovoCiclo = rif && (!u || (settimana(P, u.sett) || {}).cicloN !== w.cicloN);
+    let pulito = !u || nuovoCiclo;
+    if (u && nuovoCiclo) {
+      if (u.dolore) { kg = tab - incBil(tab); pulito = false; motivo = `Ciclo nuovo, ma l'ultima volta hai segnato dolore: un gradino sotto (${fmtKg(kg)} kg). Se torna sopra 3 su 10, chiedi al coach.`; }
+    } else if (u) {
       const ku = kgDi(u);
       const set = fatte(u);
       const target = u.ripTarget ? Math.min(...u.ripTarget) : rip;
       const mancata = set.some(s => s.rip < target) || set.length < (u.ripTarget ? u.ripTarget.length : 1);
       const ult = set[set.length - 1];
       const dura = (ult && ult.rir === 0) || u.tecnica;
-      const tabU = kgTabella(P, def.lift, u.sett);
+      // lo scarto dalla tabella vale solo dentro lo stesso ciclo: un ciclo nuovo riparte dal massimale
+      const wU = settimana(P, u.sett);
+      const tabU = wU && wU.cicloN === w.cicloN ? kgTabella(P, def.lift, u.sett, storico) : null;
       const scarto = tabU == null ? 0 : ku - tabU;
       const salto = w.n - u.sett; // settimane di distanza
+      const norma = def.alterno ? 2 : 1; // lo stacco a settimane alterne: 2 settimane sono la norma
       const giu_ = w.deload || w.taper;
       if (u.dolore) {
         kg = ku - incBil(ku);
@@ -139,13 +181,17 @@
         if (giu_) kg = Math.min(ku, tab + scarto);
       } else if (salto === 0) {
         kg = ku; motivo = `Stesso carico già fatto questa settimana.`;
+      } else if (ult && ult.rir != null && ult.rir >= 4 && salto <= norma && !giu_ && !u.deload && !(wU && (wU.deload || wU.taper))) {
+        // troppo leggero: l'ultima serie con 4 o più ripetizioni in riserva (scritto dall'utente)
+        kg = Math.max(tab + scarto, ku) + incBil(ku);
+        motivo = `L'ultima serie era a RIR ${ult.rir}: troppo leggera, sali di un incremento in più (${fmtKg(arrot(kg, 2.5))} kg).`;
       } else {
-        kg = tab + scarto;
+        kg = tab + scarto; pulito = true;
         motivo = scarto === 0 ? `Tutto pulito: segui la tabella (${fmtKg(tab)} kg).`
           : `Segui la tabella mantenendo lo scarto dell'ultima volta (${scarto > 0 ? "+" : ""}${fmtKg(scarto)} kg): ${fmtKg(kg)} kg.`;
-        if (salto >= 3) { kg = Math.min(kg, ku); motivo = `Pausa di ${salto} settimane: riparti da ${fmtKg(ku)} kg.`; }
-        else if (salto === 2 && !giu_) {
-          const passo = kgTabella(P, def.lift, u.sett + 1) - (tabU ?? ku);
+        if (salto >= norma + 2) { kg = Math.min(kg, ku); motivo = `Pausa di ${salto} settimane: riparti da ${fmtKg(ku)} kg.`; }
+        else if (salto === norma + 1 && !giu_ && tabU != null) {
+          const passo = kgTabella(P, def.lift, u.sett + norma, storico) - tabU;
           if (passo > 0 && kg > ku + passo) { kg = ku + passo; motivo = `Hai saltato una settimana: sali di un solo passo (${fmtKg(kg)} kg).`; }
         }
       }
@@ -163,7 +209,8 @@
       return { kg: arrot(kg, 2.5), rip: Array(serieN).fill(rip), rir: [0, 0], range: [rip, rip], test: true, motivo };
     }
     kg = arrot(kg, 2.5);
-    return { kg, rip: Array(serieN).fill(rip), rir: w.rir.slice(), range: [rip, rip], motivo };
+    if (nuovoCiclo && pulito) motivo = `Ciclo nuovo: ${Math.round(cal[2] * 100)}% del massimale stimato (${fmtKg(Math.round(rif.e1))} kg)${rif.pausa ? ", ridotto per la pausa lunga" : ""}: ${fmtKg(kg)} kg.`;
+    return { kg, rip: Array(serieN).fill(rip), rir: w.rir.slice(), range: [rip, rip], motivo: mant + motivo };
   }
 
   // ---------- trazioni ----------
@@ -180,9 +227,13 @@
   function pianoTrazioni(P, def, w, storico, primaDi) {
     const lettera = def.id.split(".")[0];
     if (w.traz === "max" || w.trazTestIn === lettera) return { kg: 0, rip: [null], rir: [0, 0], range: null, test: true, motivo: "Test: una sola serie al massimo, ROM pieno. Scrivi quante ne hai fatte: da qui il motore ricalcola le serie." };
-    const [serieN, tetto] = w.traz;
-    const h = storia(storico, TRAZ, primaDi).filter(e => !e.test);
     const mx = massimaleTrazioni(P, storico, primaDi);
+    // tetto null (cicli dopo dicembre): tre quarti dell'ultimo massimale
+    const serieN = w.traz[0], tetto = w.traz[1] ?? (mx ? Math.max(5, Math.round(0.75 * mx.max)) : 8);
+    // obiettivo raggiunto (es. 12): dai cicli dopo dicembre trazioni zavorrate in doppia progressione
+    const ob = (P.obiettivi || []).find(o => o.tipo === "trazioni");
+    if (w.cicloN && ob && mx && mx.max >= ob.rip) return pianoZavorra(P, def, w, storico, primaDi, serieN, ob);
+    const h = storia(storico, TRAZ, primaDi).filter(e => !e.test);
     // senza storia si parte dal 65% del massimale (minimo 3), mai sopra il calendario
     const partenza = mx ? Math.min(tetto, Math.max(3, Math.floor(0.65 * mx.max))) : tetto;
     const piano = (rip, motivo) => ({ kg: 0, rip, rir: w.rir.slice(), range: [Math.min(...rip), Math.max(...rip)], motivo });
@@ -219,6 +270,17 @@
     return piano(r, `L'ultima volta non tutte riuscite: ripeti ${testo(r)}.`);
   }
 
+  function pianoZavorra(P, def, w, storico, primaDi, serieN, ob) {
+    const conKg = storico.filter(s => fatte(s.esercizi && s.esercizi[def.id]).some(x => x.kg > 0));
+    const d = { id: def.id, nome: def.nome, tipo: "accessorio", serie: serieN, range: [5, 8], kg: 2.5, inc: 2.5 };
+    if (!storia(conKg, [def.id], primaDi).length) {
+      const n = w.deload || w.taper ? Math.max(1, Math.ceil(serieN / 2)) : serieN;
+      return { kg: 2.5, rip: Array(n).fill(5), rir: rirDi(d, w), range: [5, 8], zavorra: true, motivo: `Obiettivo di ${ob.rip} trazioni raggiunto: da qui con zavorra (cintura o manubrio tra i piedi). Parti da 2,5 kg × 5, poi doppia progressione fino a 8.` };
+    }
+    const p = pianoAccessorio(P, d, w, conKg, primaDi);
+    return Object.assign(p, { zavorra: true, motivo: "Trazioni zavorrate. " + p.motivo });
+  }
+
   // ---------- accessori (doppia progressione) ----------
   function pianoAccessorio(P, def, w, storico, primaDi) {
     const range = rangeDi(def, w);
@@ -227,6 +289,7 @@
     let serieN = def.serie;
     const leggero = w.deload || w.taper;
     if (leggero) serieN = Math.max(1, Math.ceil(def.serie / 2));
+    else if (w.fattoreSerie) serieN = Math.max(1, Math.round(def.serie * w.fattoreSerie)); // ponte: circa 2/3
     // storia: per gli esercizi legati usa anche quella dell'esercizio di riferimento
     const ids = def.legatoA ? [def.id, def.legatoA] : [def.id];
     const h = storia(storico, ids, primaDi);
@@ -244,7 +307,7 @@
     }
     const norm = h.filter(e => !e.deload);
     const u = norm[0] || h[0];
-    let kg = def.kg, rips, motivo;
+    let kg = def.macchina && storico && storico.nuovaPalestra ? null : def.kg, rips, motivo;
 
     if (!u) {
       if (kg == null) {
@@ -343,7 +406,7 @@
       const [n, r] = def.id.endsWith("balzi") ? [3, 3] : w.salti;
       return { kg: 0, rip: Array(n).fill(r), rir: [3, 5], range: [r, r], motivo: "Esplosivi, da fresco: qualità prima del numero." };
     }
-    const n = w.deload || w.taper ? Math.max(1, Math.ceil(def.serie / 2)) : def.serie;
+    const n = w.deload || w.taper ? Math.max(1, Math.ceil(def.serie / 2)) : w.fattoreSerie ? Math.max(1, Math.round(def.serie * w.fattoreSerie)) : def.serie;
     return { kg: 0, rip: Array(n).fill(def.range[0]), rir: rirDi(def, w), range: def.range.slice(), motivo: "" };
   }
 
@@ -430,6 +493,19 @@
     let giorniUtili = 0;
     for (let g = dow; ; g = (g + 1) % 7) { if (g !== 6) giorniUtili++; if (g === 0) break; }
     const rimaste = ["A", "B", "C"].filter(l => !fatteSett.includes(l));
+    // settimane da 2 sedute: previste dal programma (ponte) o perché nelle ultime 2 settimane
+    // ne hai fatte al massimo 2. Prima A e C con dentro gli esercizi chiave di B; B solo come terza.
+    const wOggi = settimanaDi(P, oggi);
+    const perDue = wOggi && wOggi.dueSedute ? "programma" : modoDue(P, storico, oggi) ? "frequenza" : null;
+    const restaAC = ["A", "C"].filter(l => rimaste.includes(l));
+    if (perDue && restaAC.length && restaAC.length <= giorniUtili) {
+      const scelta = restaAC.find(l => !vietata(l)) || restaAC[0];
+      avvisi.push(perDue === "programma" ? "Settimana da 2 sedute (A e C, con dentro gli esercizi chiave di B). Una terza, B, solo se ti va."
+        : "Nelle ultime 2 settimane hai fatto al massimo 2 sedute: l'app passa alla versione da 2 (A e C, con dentro gli esercizi chiave di B). Torna a 3 appena una settimana ne conta 3.");
+      if (vietata(scelta)) avvisi.push(diIeri.some(gambe) ? `Ieri hai fatto ${diIeri.find(gambe)}: tieni il RIR alto.` : "Domani c'è tennis: tieni il RIR alto.");
+      if (dow === 2) avvisi.push("Stasera bachata: va bene qualsiasi seduta, ma non arrivarci distrutto.");
+      return { scelta, fatte: fatteSett, avvisi, corta: false, senzaB: true, perDue };
+    }
     const corta = rimaste.length > giorniUtili;
     let scelta;
     if (corta) {
@@ -458,6 +534,39 @@
     if (dow === 2) avvisi.push("Stasera bachata: va bene qualsiasi seduta, ma non arrivarci distrutto.");
     if (scelta === "D") avvisi.push("D è opzionale: falla solo se arrivi fresco.");
     return { scelta, fatte: fatteSett, avvisi, corta, senzaB: corta && rimaste.includes("B") };
+  }
+
+  // Al massimo 2 sedute (A, B, C) in ciascuna delle 2 settimane precedenti, almeno una per
+  // settimana (una settimana vuota è una pausa, non un'abitudine). Le settimane da 2 previste
+  // dal programma (ponte) non contano.
+  function modoDue(P, storico, oggi) {
+    const lun = lunediDi(oggi);
+    for (let k = 1; k <= 2; k++) {
+      const da = new Date(Date.parse(lun + "T12:00:00Z") - 7 * k * GIORNO).toISOString().slice(0, 10);
+      const a = new Date(Date.parse(da + "T12:00:00Z") + 6 * GIORNO).toISOString().slice(0, 10);
+      const w = settimanaDi(P, da);
+      if (!w || w.dueSedute) return false;
+      const n = new Set(storico.filter(s => s.data >= da && s.data <= a && !s.iniziale && "ABC".includes(s.seduta)).map(s => s.seduta)).size;
+      if (n < 1 || n > 2) return false;
+    }
+    return true;
+  }
+
+  // ---------- palestra nuova ----------
+  // Dalla data indicata le macchine e i cavi ripartono da zero (carichi non confrontabili);
+  // bilancieri, manubri e corpo libero tengono la storia.
+  function perPalestra(P, storico, dal) {
+    if (!dal) return storico;
+    const mac = new Set();
+    for (const L of Object.keys(P.sedute)) for (const e of P.sedute[L].esercizi) if (e.macchina) mac.add(e.id);
+    const out = storico.map(s => {
+      if (s.data >= dal || !s.esercizi) return s;
+      const es = {};
+      for (const id of Object.keys(s.esercizi)) if (!mac.has(id)) es[id] = s.esercizi[id];
+      return Object.assign({}, s, { esercizi: es });
+    });
+    out.nuovaPalestra = dal; // le macchine senza storia: carico da trovare, non quello del programma
+    return out;
   }
 
   // ---------- prontezza: tre domande prima della seduta ----------
@@ -505,11 +614,19 @@
         let best = 0;
         for (const e of h) for (const s of fatte(e)) best = Math.max(best, s.rip + (s.rir == null ? 1 : Math.min(s.rir, 5)));
         r.stima = Math.max(test, best); r.daTest = test; r.data = h[0] ? h[0].data : null;
+        if (test >= o.rip) r.obiettivo = Object.assign({}, o, { nota: "raggiunto al test: dal prossimo ciclo trazioni zavorrate" });
         return r;
       }
       let e1 = 0;
       for (const e of h) for (const s of fatte(e)) if (s.kg) { const x = e1rm(s.kg, s.rip, s.rir); if (x > e1) { e1 = x; r.data = e.data; } }
       if (e1 > 0) r.stima = giu(kgPer(e1, o.rip, 0), o.inc || 2.5);
+      // obiettivo raggiunto con passo: sale da solo al gradino successivo
+      if (o.passo && r.stima != null && r.stima >= o.kg) {
+        let kg = o.kg;
+        while (r.stima >= kg) kg += o.passo;
+        r.obiettivo = Object.assign({}, o, { kg, nota: `${fmtKg(o.kg)} × ${o.rip} raggiunto, nuovo obiettivo` });
+        r.raggiunto = o.kg;
+      }
       return r;
     });
   }
@@ -527,7 +644,7 @@
     return righe.join("\n");
   }
 
-  const Motore = { avvicinamento, dischi, progressoObiettivi, prontezza, massimaleTrazioni, defDi, pianoAlternativa, adattaForma, settimanaDi, settimana, eserciziDi, pianoSeduta, prossimaSeduta, testoSeduta, riga, storia, fatte, kgDi, e1rm, fmtKg, lunediDi, giorni };
+  const Motore = { modoDue, perPalestra, rifCiclo, avvicinamento, dischi, progressoObiettivi, prontezza, massimaleTrazioni, defDi, pianoAlternativa, adattaForma, settimanaDi, settimana, eserciziDi, pianoSeduta, prossimaSeduta, testoSeduta, riga, storia, fatte, kgDi, e1rm, fmtKg, lunediDi, giorni };
   if (typeof module !== "undefined" && module.exports) module.exports = Motore;
   else root.Motore = Motore;
 })(typeof globalThis !== "undefined" ? globalThis : this);

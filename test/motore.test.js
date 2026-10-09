@@ -15,7 +15,9 @@ test("settimane", () => {
   assert.equal(M.settimanaDi(P, "2026-10-12").n, 7);
   assert.equal(M.settimanaDi(P, "2026-10-18").n, 7);
   assert.equal(M.settimanaDi(P, "2026-12-20").n, 16);
-  assert.equal(M.settimanaDi(P, "2026-12-21"), null);
+  assert.equal(M.settimanaDi(P, "2026-12-21").n, 17); // dopo dicembre il programma continua da solo
+  assert.equal(M.settimanaDi(P, "2027-02-01").n, 23);
+  assert.equal(M.settimanaDi(P, "2028-06-19"), null);
   assert.equal(M.settimanaDi(P, "2026-08-01"), null);
 });
 
@@ -23,8 +25,9 @@ test("A settimana 7 senza storico", () => {
   const p = M.pianoSeduta(P, "A", "2026-10-12", []);
   const sq = trova(p, "A.squat");
   assert.equal(sq.kg, 110); assert.deepEqual(sq.rip, [4, 4, 4, 4]);
-  const hack = trova(p, "A.hack");
-  assert.deepEqual(hack.range, [6, 10]); assert.equal(hack.kg, 110); // 100 totale (due lati) × 12 → 110 × 6
+  assert.equal(trova(p, "A.hack"), undefined); // dalla settimana 7 al suo posto la panca inclinata
+  const inc = trova(p, "A.inclinata30");
+  assert.deepEqual(inc.range, [8, 10]); assert.equal(inc.kg, 20); assert.equal(inc.rip.length, 3);
   assert.equal(trova(p, "A.bulgari"), undefined); assert.ok(trova(p, "A.legcurl"));
   assert.deepEqual(trova(p, "A.trazioni").rip, [4, 4, 4, 4]); // 65% di 7, senza storia
   assert.ok(trova(p, "A.salti")); assert.equal(trova(p, "A.salti").rip.length, 5);
@@ -44,12 +47,13 @@ test("squat: RIR 0 sull'ultima -> ripete", () => {
   assert.equal(trova(M.pianoSeduta(P, "A", "2026-10-19", st), "A.squat").kg, 110);
 });
 test("squat: indietro di 2,5 rispetto alla tabella, poi pulito -> mantiene lo scarto", () => {
-  const st = [sed("2026-10-19", 8, "A", { "A.squat": es([[110, 4, 2], [110, 4, 2], [110, 4, 1], [110, 4, 1]], { ripTarget: [4, 4, 4, 4] }) })];
-  assert.equal(trova(M.pianoSeduta(P, "A", "2026-10-26", st), "A.squat").kg, 112.5);
+  const st = [sed("2026-10-26", 9, "A", { "A.squat": es([[110, 4, 2], [110, 4, 2], [110, 4, 1], [110, 4, 1]], { ripTarget: [4, 4, 4, 4] }) })];
+  assert.equal(trova(M.pianoSeduta(P, "A", "2026-11-02", st), "A.squat").kg, 112.5);
 });
-test("stacco: settimana saltata -> un solo passo", () => {
+test("stacco a settimane alterne: 2 settimane sono la norma, 4 una pausa", () => {
   const st = [sed("2026-10-14", 7, "C", { "C.stacco": es([[110, 4, 2], [110, 4, 2], [110, 4, 2]], { ripTarget: [4, 4, 4] }) })];
-  assert.equal(trova(M.pianoSeduta(P, "C", "2026-10-28", st), "C.stacco").kg, 112.5);
+  assert.equal(trova(M.pianoSeduta(P, "C", "2026-10-28", st), "C.stacco").kg, 115); // tabella 97,5 + scarto 17,5
+  assert.equal(trova(M.pianoSeduta(P, "C", "2026-11-12", st), "C.stacco").kg, 110); // settimana 11: riparte da 110
 });
 
 test("panca: 8/8/7/8 -> stesso carico, +1 rip", () => {
@@ -96,12 +100,12 @@ test("trazioni: scala serie per serie, tetto sulla prima", () => {
   assert.deepEqual(trova(M.pianoSeduta(P, "C", "2026-10-15", [sed("2026-10-14", 7, "B", { "B.trazioni": r0 })]), "C.trazioni").rip, [6, 6, 6, 6]);
 });
 test("deload settimana 12: metà serie, niente salti", () => {
-  const st = [sed("2026-11-09", 11, "A", { "A.hack": es([[70, 7, 2], [70, 7, 1], [70, 6, 1]], { range: [5, 8] }) })];
+  const st = [sed("2026-11-09", 11, "A", { "A.inclinata30": es([[24, 9, 2], [24, 9, 1], [24, 8, 1]], { range: [8, 10] }) })];
   const p = M.pianoSeduta(P, "A", "2026-11-16", st);
-  const h = trova(p, "A.hack");
-  assert.ok(h.kg <= 70 && h.kg >= 60, "kg " + h.kg); assert.equal(h.rip.length, 1); assert.deepEqual(h.range, [8, 10]);
+  const h = trova(p, "A.inclinata30");
+  assert.ok(h.kg <= 24 && h.kg >= 18, "kg " + h.kg); assert.equal(h.rip.length, 2);
   assert.equal(trova(p, "A.salti"), undefined);
-  assert.equal(trova(p, "A.squat").kg, 112.5);
+  assert.equal(trova(p, "A.squat").kg, 110);
 });
 test("scrollate solo con D", () => {
   assert.ok(trova(M.pianoSeduta(P, "C", "2026-10-15", [], { conD: true }), "C.scrollate"));
@@ -187,12 +191,12 @@ test("settimana 16: test singoli, accessori leggeri, trazioni solo in B dopo la 
   const pa = trova(b, "B.panca"); assert.equal(pa.kg, 28); assert.deepEqual(pa.rip, [8]); assert.ok(pa.test);
   assert.equal(trova(b, "B.lat").rip.length, 1); assert.deepEqual(trova(b, "B.lat").rir, [3, 4]);
   assert.equal(trova(M.pianoSeduta(P, "A", "2026-12-14", []), "A.trazioni"), undefined);
-  // squat: tentativo = min(tabella 130, stima dalle settimane 13-14)
-  const forte = [sed("2026-12-01", 14, "A", { "A.squat": es([[127.5, 3, 1], [127.5, 3, 1]]) })];
-  assert.equal(trova(M.pianoSeduta(P, "A", "2026-12-14", forte), "A.squat").kg, 130);
-  const debole = [sed("2026-12-01", 14, "A", { "A.squat": es([[120, 3, 1], [120, 3, 1]]) })];
+  // squat: tentativo = min(tabella 122,5, stima dalle settimane 13-14)
+  const forte = [sed("2026-12-01", 14, "A", { "A.squat": es([[120, 3, 1], [120, 3, 1]]) })];
+  assert.equal(trova(M.pianoSeduta(P, "A", "2026-12-14", forte), "A.squat").kg, 122.5);
+  const debole = [sed("2026-12-01", 14, "A", { "A.squat": es([[115, 3, 1], [115, 3, 1]]) })];
   const sq = trova(M.pianoSeduta(P, "A", "2026-12-14", debole), "A.squat");
-  assert.equal(sq.kg, 122.5); assert.deepEqual(sq.rip, [3]); assert.deepEqual(sq.rir, [0, 0]);
+  assert.equal(sq.kg, 117.5); assert.deepEqual(sq.rip, [3]); assert.deepEqual(sq.rir, [0, 0]);
   // laterali: storia sotto l'obiettivo -> parte dalla stima
   const lat = [sed("2026-12-10", 15, "C", { "C.laterali": es([[12, 12, 2]]) }), sed("2026-11-26", 13, "C", { "C.laterali": es([[12, 13, 1]]) })];
   const l = trova(M.pianoSeduta(P, "C", "2026-12-17", lat), "C.laterali");
@@ -296,15 +300,16 @@ test("settimane a onda: in forza la panca pesante apre B, la panca 8-10 resta a 
 test("ricalibrazione del 9 ottobre: più braccia e spalle, meno gambe e dorso", () => {
   const serie = (L, d) => Object.fromEntries(M.pianoSeduta(P, L, d, []).esercizi.map(e => [e.def.id, e.rip.length]));
   const a = serie("A", "2026-10-12"), b = serie("B", "2026-10-21"), c = serie("C", "2026-10-15");
-  assert.equal(a["A.hack"], 2); assert.equal(a["A.laterali"], 4); assert.equal(a["A.curlCavi"], 2); assert.equal(a["A.pushBarra"], 2);
+  assert.equal(a["A.inclinata30"], 3); assert.ok(!("A.hack" in a)); assert.equal(a["A.laterali"], 4); assert.equal(a["A.curlCavi"], 2); assert.equal(a["A.pushBarra"], 2);
   assert.equal(b["B.lat"], 2); assert.equal(b["B.pulley"], 2); assert.equal(b["B.laterali"], 4);
-  assert.equal(c["C.inclinata30"], 3); assert.equal(c["C.pushdown"], 2); assert.ok(!("C.panca" in c));
+  assert.equal(c["C.inclinata30"], 3); assert.equal(c["C.pushdown"], 3); assert.equal(c["C.martello"], 2); assert.equal(c["C.military"], 2); assert.ok(!("C.panca" in c));
+  assert.equal(b["B.tricipiti"], 4); assert.equal(b["B.crunch"], 2);
   // in scarico le serie si dimezzano come prima
   assert.equal(serie("A", "2026-11-16")["A.curlCavi"], 1);
 });
 test("dolore su squat e stacco: scende di un gradino", () => {
   const st = [sed("2026-10-15", 7, "C", { "C.stacco": es([[92.5, 4, 2], [92.5, 4, 2], [92.5, 4, 2]], { ripTarget: [4, 4, 4], dolore: true }) })];
-  const p = trova(M.pianoSeduta(P, "C", "2026-10-22", st), "C.stacco");
+  const p = trova(M.pianoSeduta(P, "C", "2026-10-29", st), "C.stacco");
   assert.equal(p.kg, 87.5); assert.match(p.motivo, /dolore/);
   assert.match(M.riga("Stacco", st[0].esercizi["C.stacco"]), /\[dolore\]/);
 });
@@ -325,4 +330,93 @@ test("accessori: serie scalate → prima tutte al carico pieno", () => {
   const p = M.pianoSeduta(P, "B", "2026-10-01", st, {}).esercizi.find(e => e.def.id === "B.tricipiti");
   assert.equal(p.kg, 21.25); assert.ok(p.rip.every(r => r === 12), String(p.rip));
   assert.match(p.motivo, /scalato/);
+});
+
+// ---------- scheda a lungo termine (9 ottobre 2026, sera) ----------
+test("stacco da terra nelle settimane F, rumeno nelle altre e nello scarico; test a dicembre", () => {
+  const ids = d => M.pianoSeduta(P, "C", d, []).esercizi.map(e => e.def.id);
+  for (const d of ["2026-10-15", "2026-10-29", "2026-11-12", "2026-11-26", "2026-12-10", "2026-12-17"]) { assert.ok(ids(d).includes("C.stacco"), d); assert.ok(!ids(d).includes("C.rdl"), d); }
+  for (const d of ["2026-10-22", "2026-11-05", "2026-11-19", "2026-12-03"]) { assert.ok(ids(d).includes("C.rdl"), d); assert.ok(!ids(d).includes("C.stacco"), d); }
+  const rdl = trova(M.pianoSeduta(P, "C", "2026-10-22", []), "C.rdl");
+  assert.equal(rdl.kg, 65); assert.deepEqual(rdl.rip, [6, 6, 6]); assert.deepEqual(rdl.rir, [2, 2]);
+  assert.equal(trova(M.pianoSeduta(P, "C", "2026-11-19", []), "C.rdl").rip.length, 2); // scarico
+  // ordine in C: inclinata prima del military
+  const c = ids("2026-10-15");
+  assert.ok(c.indexOf("C.inclinata30") < c.indexOf("C.military"));
+});
+test("squat: ultima serie a RIR 4 -> un incremento in più", () => {
+  const st = [sed("2026-10-12", 7, "A", { "A.squat": es([[110, 4, 4], [110, 4, 4], [110, 4, 4], [110, 4, 4]], { ripTarget: [4, 4, 4, 4] }) })];
+  const p = trova(M.pianoSeduta(P, "A", "2026-10-19", st), "A.squat");
+  assert.equal(p.kg, 117.5); assert.match(p.motivo, /troppo leggera/);
+});
+test("ponte di viaggio: 2 sedute, 2/3 delle serie, squat dal massimale di dicembre", () => {
+  const st = [sed("2026-12-14", 16, "A", { "A.squat": es([[122.5, 3, 0]], { ripTarget: [3] }) })];
+  const p = M.pianoSeduta(P, "A", "2026-12-21", st);
+  assert.equal(p.settimana.blocco, "Ponte");
+  const sq = trova(p, "A.squat");
+  // 122,5 × 3 a RIR 0 → massimale stimato 134,75, meno 5% = 128; 3 × 5 al 78,9% = 101 → 100
+  assert.equal(sq.kg, 100); assert.deepEqual(sq.rip, [5, 5, 5]);
+  assert.equal(trova(p, "A.laterali").rip.length, 3); // 4 × 0,67
+  assert.equal(trova(p, "A.trazioni").rip.length, 3);
+  const pr = M.prossimaSeduta(P, [], "2026-12-21");
+  assert.equal(pr.scelta, "A"); assert.ok(pr.senzaB); assert.equal(pr.perDue, "programma");
+});
+test("cicli da febbraio: percentuale del massimale del ciclo precedente, scarto azzerato", () => {
+  const st = [sed("2027-01-25", 22, "A", { "A.squat": es([[105, 5, 2], [105, 5, 2], [105, 5, 2]], { ripTarget: [5, 5, 5] }) })];
+  const sq = trova(M.pianoSeduta(P, "A", "2027-02-01", st), "A.squat");
+  // 105 × 5 a RIR 2 → 127,75 − 5% = 121,4; 4 × 6 al 76,9% = 93,3 → 92,5
+  assert.equal(sq.kg, 92.5); assert.deepEqual(sq.rip, [6, 6, 6, 6]); assert.match(sq.motivo, /Ciclo nuovo/);
+  // senza dati nel ciclo precedente (viaggio senza bilanciere): ultimi dati, ridotti per la pausa
+  const vecchio = [sed("2026-12-14", 16, "A", { "A.squat": es([[122.5, 3, 0]], { ripTarget: [3] }) })];
+  const sv = trova(M.pianoSeduta(P, "A", "2027-02-01", vecchio), "A.squat");
+  assert.ok(sv.kg <= 90 && sv.kg >= 80, "kg " + sv.kg);
+});
+test("tetto squat: oltre 122,5 × 3 si passa a mantenimento con 3 serie", () => {
+  const st = [sed("2027-03-01", 27, "A", { "A.squat": es([[125, 3, 1], [125, 3, 1], [125, 3, 1], [125, 3, 1]], { ripTarget: [3, 3, 3, 3] }) })];
+  const sq = trova(M.pianoSeduta(P, "A", "2027-03-15", st), "A.squat"); // settimana 29, ciclo 2
+  assert.equal(sq.rip.length, 3); assert.match(sq.motivo, /Tetto raggiunto/);
+  assert.ok(sq.kg <= 105, "kg " + sq.kg); // 76,9% del massimale fermato al tetto (134,75 × 0,95)
+});
+test("trazioni: obiettivo 12 al test -> nei cicli trazioni zavorrate", () => {
+  const st = [sed("2027-03-02", 27, "B", { "B.trazioni": es([[0, 12, 0]], { test: true, ripTarget: [null] }) })];
+  const t = trova(M.pianoSeduta(P, "A", "2027-03-15", st), "A.trazioni");
+  assert.ok(t.zavorra); assert.equal(t.kg, 2.5); assert.deepEqual(t.rip, [5, 5, 5, 5]);
+  // seduta pulita a 8 con 2,5 kg -> sale
+  const st2 = st.concat([sed("2027-03-15", 29, "A", { "A.trazioni": es([[2.5, 8, 2], [2.5, 8, 2], [2.5, 8, 1], [2.5, 8, 1]], { range: [5, 8], ripTarget: [5, 5, 5, 5] }) })]);
+  assert.equal(trova(M.pianoSeduta(P, "A", "2027-03-22", st2), "A.trazioni").kg, 5);
+  // sotto l'obiettivo resta la scala a corpo libero, tetto = 3/4 del massimale
+  const st3 = [sed("2027-03-02", 27, "B", { "B.trazioni": es([[0, 10, 0]], { test: true, ripTarget: [null] }) })];
+  const t3 = trova(M.pianoSeduta(P, "A", "2027-03-15", st3), "A.trazioni");
+  assert.ok(!t3.zavorra); assert.deepEqual(t3.rip, [6, 6, 6, 6]);
+});
+test("frequenza: 2 settimane con 2 sedute -> versione da 2; una con 3 -> si torna a 3", () => {
+  const due = [sed("2026-10-12", 7, "A", {}), sed("2026-10-15", 7, "C", {}), sed("2026-10-19", 8, "A", {}), sed("2026-10-22", 8, "C", {})];
+  const pr = M.prossimaSeduta(P, due, "2026-10-26");
+  assert.equal(pr.perDue, "frequenza"); assert.equal(pr.scelta, "A"); assert.ok(pr.senzaB);
+  // fatte A e C: B resta possibile come terza
+  const pr2 = M.prossimaSeduta(P, due.concat([sed("2026-10-26", 9, "A", {}), sed("2026-10-28", 9, "C", {})]), "2026-10-29");
+  assert.equal(pr2.scelta, "B");
+  const tre = due.concat([sed("2026-10-21", 8, "B", {})]);
+  assert.equal(M.prossimaSeduta(P, tre, "2026-10-26").perDue, undefined);
+  // una settimana vuota è una pausa, non un'abitudine
+  assert.equal(M.modoDue(P, due.slice(2), "2026-10-26"), false);
+});
+test("palestra nuova: macchine e cavi da zero, bilancieri e manubri no", () => {
+  const st = [sed("2027-01-28", 22, "B", { "B.lat": es([[70, 10, 2]]), "B.panca": es([[26, 9, 2]]) })];
+  const nuovo = M.perPalestra(P, st, "2027-02-01");
+  assert.ok(!nuovo[0].esercizi["B.lat"]); assert.ok(nuovo[0].esercizi["B.panca"]);
+  assert.equal(st[0].esercizi["B.lat"].serie[0].kg, 70); // l'originale non cambia
+  assert.equal(M.perPalestra(P, st, null), st);
+  const lat = trova(M.pianoSeduta(P, "B", "2027-02-03", nuovo), "B.lat");
+  assert.equal(lat.kg, null); assert.match(lat.motivo, /Carico da trovare/);
+});
+test("obiettivi raggiunti salgono da soli", () => {
+  const st = [sed("2026-12-17", 16, "C", { "C.laterali": es([[14, 13, 1]]) })];
+  const r = M.progressoObiettivi(P, st, "2026-12-18").find(x => x.nome === "Alzate laterali");
+  assert.equal(r.obiettivo.kg, 16); assert.equal(r.raggiunto, 14);
+});
+test("tetto: la stima non basta, serve la serie vera", () => {
+  const st = [sed("2026-10-02", 5, "A", { "A.squat": es([[110, 5, null], [110, 5, null]], { ripTarget: [5, 5] }) })];
+  const sq = trova(M.pianoSeduta(P, "A", "2027-02-01", st), "A.squat");
+  assert.equal(sq.rip.length, 4); assert.doesNotMatch(sq.motivo, /Tetto/);
 });

@@ -1316,5 +1316,107 @@
       "inc": 0,
       "kgDa": "corpo libero"
     }
+  ],
+  "A.inclinata30": [
+    {
+      "id": "alt.inclinataBilanciere30",
+      "nome": "Panca inclinata bilanciere",
+      "quando": "occupato",
+      "nota": "Schienale a 30 gradi, bilanciere al petto alto.",
+      "inc": 2.5,
+      "kgDa": "≈ 2 volte il peso di un manubrio, meno 5-10 kg"
+    },
+    {
+      "id": "alt.chestPressInclinata30",
+      "nome": "Chest press inclinata alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto alto.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.inclinataBassa1530",
+      "nome": "Panca inclinata bassa (15-20 gradi)",
+      "quando": "dolore",
+      "nota": "Meno flessione della spalla; presa neutra se serve.",
+      "inc": 2,
+      "kgDa": "≈ 100% del peso abituale"
+    },
+    {
+      "id": "alt.crociCaviDalBasso30",
+      "nome": "Croci ai cavi dal basso",
+      "quando": "dolore",
+      "nota": "Mani dal basso verso il mento: petto alto con meno carico sulla spalla.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "C.rdl": [
+    {
+      "id": "alt.rdlManubri",
+      "nome": "Stacco rumeno con manubri",
+      "quando": "entrambi",
+      "nota": "Manubri lungo le cosce, anca indietro, schiena neutra; scendi finché senti i femorali tirare.",
+      "inc": 2,
+      "kgDa": "ogni manubrio ≈ 35-40% del carico del bilanciere"
+    },
+    {
+      "id": "alt.rdlAltroBilanciere",
+      "nome": "Stacco rumeno con un altro bilanciere o alla Smith",
+      "quando": "occupato",
+      "nota": "Stessa tecnica; alla Smith il carico non è confrontabile.",
+      "inc": 2.5,
+      "kgDa": "≈ 100% (Smith: da trovare)"
+    },
+    {
+      "id": "alt.iperZavorra",
+      "nome": "Iperestensioni 45 gradi con disco",
+      "quando": "dolore",
+      "nota": "Disco al petto, arrotonda appena la parte alta e spingi con glutei e femorali; niente iperestensione in cima.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.pullThrough",
+      "nome": "Pull-through al cavo",
+      "quando": "dolore",
+      "nota": "Cavo basso tra le gambe, di spalle alla macchina: spingi l'anca avanti. Quasi niente carico sulla schiena.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    }
+  ],
+  "B.crunch": [
+    {
+      "id": "alt.crunchMacchina",
+      "nome": "Crunch alla macchina",
+      "quando": "occupato",
+      "nota": "Arrotola la colonna, non tirare con le braccia.",
+      "inc": 2.5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.captainsChair",
+      "nome": "Sedia romana (captain's chair)",
+      "quando": "entrambi",
+      "nota": "Avambracci appoggiati: niente presa né spalla appesa. Arrotola il bacino.",
+      "inc": 0,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.crunchInversoPanca",
+      "nome": "Crunch inverso su panca",
+      "quando": "entrambi",
+      "nota": "Mani dietro la testa sulla panca, porta le ginocchia al petto alzando il bacino.",
+      "inc": 0,
+      "kgDa": "corpo libero (0 kg)"
+    },
+    {
+      "id": "alt.deadBug",
+      "nome": "Dead bug",
+      "quando": "dolore",
+      "nota": "Schiena bassa premuta a terra, estendi braccio e gamba opposti lentamente.",
+      "inc": 0,
+      "kgDa": "corpo libero (0 kg)"
+    }
   ]
 }

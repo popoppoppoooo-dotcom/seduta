@@ -16,6 +16,9 @@
     let msg = "";
     try { msg = JSON.parse(corpo).error.message || ""; } catch (_) { msg = corpo.slice(0, 200); }
     if (stato === 400 && /API key/i.test(msg)) return "Chiave API non valida: controllala in Altro → Assistente.";
+    // 402: la chiave è valida, ma il suo progetto ha la fatturazione prepagata senza credito
+    // (con la fatturazione attiva il livello gratuito non vale più)
+    if (stato === 402) return "La chiave funziona, ma è in un progetto Google con fatturazione prepagata e credito finito (402). In AI Studio crea la chiave in un progetto nuovo, senza fatturazione: lì vale il livello gratuito. Intanto usa \"Manda all'app Gemini\".";
     if (stato === 403) return "Chiave senza permesso per questo modello (403). " + msg;
     if (stato === 404) return "Modello non trovato (404): in Altro → Assistente tocca \"Trova modelli\" e scegline uno.";
     if (stato === 429) return "Quota gratuita esaurita per ora (429): riprova tra qualche minuto, o usa \"Manda all'app Gemini\".";

@@ -82,6 +82,8 @@
     return new Promise(ok => c.toBlob(ok, "image/jpeg", q));
   }
   async function salvaImp() { await DB.kvMetti("imp", S.imp); }
+  // storico per i calcoli: dopo "Palestra nuova" macchine e cavi ripartono da zero (lo storico vero resta)
+  const sto = () => M.perPalestra(P, S.sedute, S.imp.nuovaPalestra);
   let timerBozza;
   function salvaBozza() { clearTimeout(timerBozza); timerBozza = setTimeout(() => DB.kvMetti("bozza", S.bozza), 250); }
 
@@ -126,13 +128,14 @@
     if (S.riepilogo) return vRiepilogo();
     const d = oggi();
     const w = M.settimanaDi(P, d);
-    const pr = M.prossimaSeduta(P, S.sedute, d, { forma: S.forma });
+    const pr = M.prossimaSeduta(P, sto(), d, { forma: S.forma });
     let h = `<h1>${w ? `Settimana ${w.n} · ${esc(w.blocco)}${ondaTxt(w)}` : "Fuori programma"}</h1>`;
     if (w) {
       h += `<p class="tenue">${dataBreve(d)} · RIR ${w.rir[0]}${w.rir[1] !== w.rir[0] ? "-" + w.rir[1] : ""}${w.deload ? " · scarico" : ""}</p>`;
       if (w.nota) h += `<div class="avviso">${esc(w.nota)}</div>`;
     } else {
-      h += `<div class="avviso">Il programma copre dal 31 agosto al 20 dicembre 2026. Per il prossimo blocco chiedi al coach un nuovo programma.js.</div>`;
+      const ultimaW = P.settimane[P.settimane.length - 1];
+      h += `<div class="avviso">${d < P.settimane[0].inizio ? "Il programma inizia il " + dataBreve(P.settimane[0].inizio) + "." : "Il programma è finito (copriva fino alla settimana del " + dataBreve(ultimaW.inizio) + "). Chiedi al coach un nuovo programma.js."}</div>`;
     }
     for (const a of pr.avvisi) h += `<div class="avviso">${esc(a)}</div>`;
     const giorniBackup = S.imp.ultimoBackup ? M.giorni(S.imp.ultimoBackup, d) : null;
@@ -163,7 +166,7 @@
     h += cartaObiettivi(d, w);
     h += `<div class="card"><b>Giorni consigliati</b><p class="tenue" style="font-size:14px">Bachata il martedì sera, tennis il sabato. Ordine A → B → C (→ D). Mai A e C in giorni consecutivi; niente A o C il venerdì.<br>4 sedute: lun A · mer B · gio C · dom D (oppure ven D leggera).<br>3 sedute: lun A · mer B · gio C (o dom C).<br>Solo 2: C e A. L'app se ne accorge da sola quando i giorni non bastano: B salta, i tricipiti vanno in A (al posto dei polpacci) e le croci inverse in C.</p></div>`;
     for (const l of ["A", "B", "C", "D"]) {
-      const p = M.pianoSeduta(P, l, d < w.inizio ? w.inizio : d, S.sedute, {});
+      const p = M.pianoSeduta(P, l, d < w.inizio ? w.inizio : d, sto(), {});
       h += `<div class="card"><b>${l} · ${esc(p.nome)}</b>${p.esercizi.map(e => `<div class="tenue" style="font-size:14px">${esc(e.def.nome)}: ${pianoBreve(e)}</div>`).join("")}</div>`;
     }
     vista.innerHTML = h;
@@ -180,18 +183,19 @@
         <div style="height:6px;background:var(--pan2);border-radius:3px;margin:4px 0"><div style="height:6px;width:${Math.round(frac * 100)}%;background:${frac >= 1 ? "var(--ok)" : "var(--acc)"};border-radius:3px"></div></div>
         <div class="tenue3">Oggi ${ora}${o.nota ? ` · ${esc(o.nota)}` : ""}</div></div>`;
     }).join("");
-    return `<details class="card"><summary><b>Verso dicembre</b> <span class="tenue3">· mancano ${Math.max(0, 16 - w.n)} settimane</span></summary>${righe}<p class="tenue3">Stima dalla tua serie migliore delle ultime 3 settimane (ripetizioni + RIR). È una stima: il numero vero lo dà il test.</p></details>`;
+    const titolo = w.n <= 16 ? `<b>Verso dicembre</b> <span class="tenue3">· mancano ${Math.max(0, 16 - w.n)} settimane</span>` : `<b>Obiettivi</b> <span class="tenue3">· salgono da soli quando li raggiungi</span>`;
+    return `<details class="card"><summary>${titolo}</summary>${righe}<p class="tenue3">Stima dalla tua serie migliore delle ultime 3 settimane (ripetizioni + RIR). È una stima: il numero vero lo dà il test.</p></details>`;
   }
   function pianoBreve(e) {
     const r = e.rip; const uguali = r.every(x => x === r[0]);
     const rip = r[0] == null ? "max" : uguali ? `${r.length} × ${r[0]}` : r.join("/");
-    const peso = e.def.tipo === "accessorio" || e.def.tipo === "bilanciere" ? (e.kg == null ? " · carico da trovare" : ` · ${kg(e.kg)} kg`) : "";
+    const peso = e.zavorra ? ` · zavorra ${kg(e.kg)} kg` : e.def.tipo === "accessorio" || e.def.tipo === "bilanciere" ? (e.kg == null ? " · carico da trovare" : ` · ${kg(e.kg)} kg`) : "";
     return rip + (e.def.perLato ? " per lato" : "") + peso;
   }
 
   // ---- crea la bozza della seduta ----
   function voceDaPiano(e, w) {
-    const mostraKg = e.def.tipo === "accessorio" || e.def.tipo === "bilanciere";
+    const mostraKg = e.def.tipo === "accessorio" || e.def.tipo === "bilanciere" || !!e.zavorra;
     const u = e.ultima;
     return {
       id: e.def.id, n: e.def.n, nome: e.def.nome, tipo: e.def.tipo, inc: e.def.tipo === "bilanciere" ? 2.5 : (e.def.inc || 2),
@@ -205,7 +209,7 @@
   // squat e stacco: carico dell'ultima seduta pesante, per la prima serie andata storta
   function kgRipiego(e, w) {
     if (e.def.tipo !== "bilanciere" || e.test || e.kg == null || !w) return null;
-    const u = M.storia(S.sedute, [e.def.id], oggi()).find(x => !x.deload && x.sett < w.n);
+    const u = M.storia(sto(), [e.def.id], oggi()).find(x => !x.deload && x.sett < w.n);
     const k = u ? M.kgDi(u) : null;
     return k != null && k < e.kg ? k : e.kg - (e.kg < 80 ? 2.5 : 5);
   }
@@ -226,15 +230,15 @@
     const w = M.settimanaDi(P, d);
     if (!w) return toast("Oggi è fuori dal programma.");
     if (conD == null) conD = S.sedute.some(s => s.seduta === "D" && s.data >= M.lunediDi(d));
-    const dueSedute = M.prossimaSeduta(P, S.sedute, d).senzaB && (l === "A" || l === "C");
-    const p = M.pianoSeduta(P, l, d, S.sedute, { conD, forma: S.forma, dueSedute });
+    const dueSedute = M.prossimaSeduta(P, sto(), d).senzaB && (l === "A" || l === "C");
+    const p = M.pianoSeduta(P, l, d, sto(), { conD, forma: S.forma, dueSedute });
     S.bozza = { id: uid(), data: d, sett: w.n, seduta: l, conD, dueSedute, forma: S.forma, inizio: Date.now(), nota: "", ordine: [], esercizi: {}, riscaldamento: p.riscaldamento, nome: p.nome };
     for (const e of p.esercizi) { const v = voceDaPiano(e, w); S.bozza.ordine.push(v.id); S.bozza.esercizi[v.id] = v; }
     salvaBozza(); render(); window.scrollTo(0, 0);
   }
   function cambiaConD(conD) {
     const b = S.bozza, w = M.settimanaDi(P, b.data);
-    const p = M.pianoSeduta(P, b.seduta, b.data, S.sedute, { conD, forma: b.forma, dueSedute: b.dueSedute });
+    const p = M.pianoSeduta(P, b.seduta, b.data, sto(), { conD, forma: b.forma, dueSedute: b.dueSedute });
     const nuovo = [], es = {};
     for (const e of p.esercizi) {
       const vecchio = Object.values(b.esercizi).find(v => v.id === e.def.id || v.alPostoDi === e.def.id);
@@ -345,7 +349,7 @@
     const w = M.settimanaDi(P, b.data);
     let nv;
     if (!altId && !nomeLibero) {
-      const p = M.pianoSeduta(P, b.seduta, b.data, S.sedute, { conD: b.conD, forma: b.forma, dueSedute: b.dueSedute });
+      const p = M.pianoSeduta(P, b.seduta, b.data, sto(), { conD: b.conD, forma: b.forma, dueSedute: b.dueSedute });
       const e = p.esercizi.find(x => x.def.id === origId);
       nv = voceDaPiano(e, w);
     } else {
@@ -353,9 +357,9 @@
         ? { id: "alt.libero." + nomeLibero.toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "_").slice(0, 30), nome: nomeLibero, inc: defO.inc || 2.5, nota: "" }
         : altPer(v).find(a => a.id === altId);
       if (!alt) return;
-      const e = M.pianoAlternativa(P, defO, alt, b.data, S.sedute, b.data);
+      const e = M.pianoAlternativa(P, defO, alt, b.data, sto(), b.data);
       const pOrig = M.adattaForma({ settimana: w, esercizi: [e] }, b.forma).esercizi[0];
-      const u = M.storia(S.sedute, [alt.id], b.data)[0];
+      const u = M.storia(sto(), [alt.id], b.data)[0];
       nv = voceDaPiano(Object.assign(pOrig, { ultima: u || null }), w);
       nv.alPostoDi = origId;
       nv.mostraKg = true;
@@ -542,12 +546,12 @@
   // Il contesto che il coach vede: conoscenze generali + profilo + dati recenti.
   async function contesto() {
     const d = oggi(), w = M.settimanaDi(P, d);
-    const pr = M.prossimaSeduta(P, S.sedute, d);
+    const pr = M.prossimaSeduta(P, sto(), d);
     const parti = [];
     parti.push(await caricaSapere());
     if (S.imp.profilo) parti.push("# Profilo dell'utente (privato)\n" + S.imp.profilo);
     let st = `# Situazione al ${d} (${dataBreve(d)})\n`;
-    if (w) st += `Settimana ${w.n} di 16, blocco ${w.blocco}${w.onda ? (w.onda === "F" ? " (settimana di forza: in B panca manubri pesante 4×5-6 per prima)" : " (settimana di ipertrofia: panca 8-10)") : ""}, RIR previsto ${w.rir.join("-")}, range accessori multiarticolari ${w.acc.join("-")}. ${w.nota || ""}\n`;
+    if (w) st += `Settimana ${w.n} di ${P.settimane.length}${w.ciclo ? " (ciclo " + w.ciclo + " da 6 settimane)" : ""}, blocco ${w.blocco}${w.onda ? (w.onda === "F" ? " (settimana di forza: in B panca manubri pesante 4×5-6 per prima)" : " (settimana di ipertrofia: panca 8-10)") : ""}, RIR previsto ${w.rir.join("-")}, range accessori multiarticolari ${w.acc.join("-")}. ${w.nota || ""}\n`;
     st += `Sedute fatte questa settimana: ${pr.fatte.join(", ") || "nessuna"}. Prossima consigliata: ${pr.scelta || "nessuna"}. ${pr.avvisi.join(" ")}\n`;
     if (S.bozza) st += `\n## Seduta in corso (${S.bozza.seduta})\n` + S.bozza.ordine.map(id => {
       const v = S.bozza.esercizi[id];
@@ -555,7 +559,7 @@
       return `- ${v.nome}: piano ${v.ripTarget.join("/")}${v.kgPiano != null ? " @ " + kg(v.kgPiano) + " kg" : ""}; fatto: ${f || "niente"}${v.saltato ? " (saltato)" : ""}`;
     }).join("\n") + "\n";
     else if (w && pr.scelta) {
-      const p = M.pianoSeduta(P, pr.scelta, d, S.sedute, {});
+      const p = M.pianoSeduta(P, pr.scelta, d, sto(), {});
       st += `\n## Piano della prossima seduta (${pr.scelta})\n` + p.esercizi.map(e => `- ${e.def.nome}: ${pianoBreve(e)} — ${e.motivo}`).join("\n") + "\n";
     }
     const recenti = S.sedute.filter(s => M.giorni(s.data, d) <= 28).sort((a, b) => (a.data < b.data ? -1 : 1));
@@ -571,7 +575,8 @@
     const fotoDate = S.corpo.filter(x => x.foto && Object.keys(x.foto).length).map(x => x.data);
     st += `\nFoto del fisico salvate nelle date: ${fotoDate.join(", ") || "nessuna"} (le vedi solo se allegate al messaggio).\n`;
     st += `\n## Programma\nIl motore dell'app calcola i carichi con regole fisse (vedi sopra). Se proponi modifiche al programma, scrivile come elenco di cambi concreti (esercizio, serie, ripetizioni, carico, da quale settimana): l'utente le passerà al Mac per aggiornare programma.js.\n`;
-    st += P.settimane.map(s => `Sett. ${s.n} (${s.inizio}) ${s.blocco}${s.onda ? " " + s.onda : ""}: squat ${Array.isArray(s.squat) ? s.squat[0] + "×" + s.squat[1] + " @ " + (P.base.squat + s.squat[2]) : s.squat}, stacco ${Array.isArray(s.stacco) ? s.stacco[0] + "×" + s.stacco[1] + " @ " + (P.base.stacco + s.stacco[2]) : s.stacco}, trazioni ${Array.isArray(s.traz) ? s.traz.join("×") : s.traz}`).join("\n");
+    const n0 = w ? w.n : 1;
+    st += (w && w.pct ? "Dalla settimana 17 i carichi di squat e stacco sono percentuali del massimale stimato all'inizio del ciclo; l'app li calcola.\n" : "") + P.settimane.filter(s => s.n >= n0 - 2 && s.n <= n0 + 8).map(s => `Sett. ${s.n} (${s.inizio}) ${s.blocco}${s.onda ? " " + s.onda : ""}: squat ${Array.isArray(s.squat) ? s.squat[0] + "×" + s.squat[1] + " @ " + (s.pct ? Math.round(s.squat[2] * 100) + "%" : P.base.squat + s.squat[2]) : s.squat}, stacco ${Array.isArray(s.stacco) ? s.stacco[0] + "×" + s.stacco[1] + " @ " + (s.pct ? Math.round(s.stacco[2] * 100) + "%" : P.base.stacco + s.stacco[2]) + (s.rdl ? " (rumeno)" : "") : s.stacco}, trazioni ${Array.isArray(s.traz) ? s.traz.join("×") : s.traz}`).join("\n");
     parti.push(st);
     return parti.filter(Boolean).join("\n\n---\n\n");
   }
@@ -637,6 +642,8 @@
       <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="storico">Storico sedute (${S.sedute.filter(s => !s.iniziale).length})</button>
       <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="partenza">Carichi di partenza</button>
       <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="assistente">Assistente (Gemini)</button>
+      <div class="card"><b>Palestra nuova</b><p class="tenue" style="font-size:14px">Cambi palestra (es. Melbourne)? Macchine e cavi pesano diverso da una palestra all'altra: da oggi l'app te ne fa ritrovare il carico. Bilancieri e manubri restano. Lo storico non si cancella.${S.imp.nuovaPalestra ? ` Ultimo cambio: ${dataBreve(S.imp.nuovaPalestra)}.` : ""}</p>
+      <div class="fila"><button class="btn cresci" data-az="palestra">Sono in una palestra nuova</button>${S.imp.nuovaPalestra ? `<button class="btn piccolo" data-az="palestra" data-v="annulla">Annulla</button>` : ""}</div></div>
       <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="aiuto">Niente distrazioni: blocca l'app sullo schermo</button>
       <div class="card"><b>Tema</b><div class="fila" style="margin-top:8px">${[["auto", "Automatico"], ["scuro", "Scuro"], ["chiaro", "Chiaro"]].map(([k, t]) => `<button class="btn piccolo cresci ${S.imp.tema === k ? "prim" : ""}" data-az="tema" data-v="${k}">${t}</button>`).join("")}</div></div>
       <p class="tenue3">Programma versione ${esc(P.versione)} · i dati non lasciano il telefono, tranne i messaggi al coach (vanno a Google) e i backup che condividi tu.</p>`;
@@ -834,6 +841,10 @@
       case "modificaSed": return modificaSeduta(el.dataset.id);
       case "eliminaSed": if (confirm("Elimino questa seduta?")) { await DB.togli("sedute", el.dataset.id); S.sedute = S.sedute.filter(s => s.id !== el.dataset.id); render(); } return;
       case "salvaPartenza": return salvaPartenza();
+      case "palestra":
+        if (el.dataset.v === "annulla") { if (!confirm("Torno ai carichi delle macchine di prima?")) return; S.imp.nuovaPalestra = null; }
+        else { if (!confirm("Da oggi macchine e cavi ripartono da zero (te li fa ritrovare). Bilancieri e manubri restano. Confermi?")) return; S.imp.nuovaPalestra = oggi(); }
+        await salvaImp(); toast(S.imp.nuovaPalestra ? "Fatto: palestra nuova da oggi." : "Annullato."); return render();
       case "tema": S.imp.tema = el.dataset.v; await salvaImp(); applicaTema(); return render();
       case "trovaModelli": {
         const box = $("#modelli"); box.innerHTML = "<p class='tenue3'>Cerco…</p>";
