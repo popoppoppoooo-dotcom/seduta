@@ -3,7 +3,7 @@
 // Il coach (o un agente) modifica SOLO questo file; la pagina e il motore no.
 // kg: null = "da testare": la pagina chiede il carico alla prima seduta.
 globalThis.PROGRAMMA = {
-  versione: "2026-10-12b",
+  versione: "2026-10-12c",
   // Carichi di riferimento di squat (X) e stacco (Y): test della settimana 1.
   // Stacco: dal 9 ottobre la tabella riparte da 90 (settimane 5-6 riscritte con il reale),
   // poi +2,5 a settimana.
@@ -19,6 +19,9 @@ globalThis.PROGRAMMA = {
   // Trazioni: traz = [serie, tetto della prima serie]. Senza storia si parte dal 65%
   // dell'ultimo massimale (test registrato o trazioniMax), minimo 3; poi scala serie per serie.
 
+  // onda (dalla settimana 7): "F" = settimana di forza, in B la panca apre la seduta, da sola,
+  // pesante (4 x 5-6); "I" = settimana di ipertrofia, panca 4 x 8-10 come prima.
+  // Scarico, rifinitura e test non hanno onda: si usa la versione "I".
   // Una riga per settimana. acc = range di ripetizioni degli accessori che
   // seguono il calendario; rir = [minimo, massimo] previsto; traz = trazioni.
   settimane: [
@@ -28,14 +31,14 @@ globalThis.PROGRAMMA = {
     { n: 4,  inizio: "2026-09-21", blocco: "Base",   acc: [8, 12], rir: [2, 2], traz: [4, 6], squat: [3, 5, 5],    stacco: [3, 5, 10],   salti: [4, 3], nota: "Test trazioni a fine settimana: una sola serie a cedimento." },
     { n: 5,  inizio: "2026-09-28", blocco: "Base",   acc: [8, 12], rir: [2, 2], traz: [4, 6], squat: [3, 5, 7.5],  stacco: [3, 5, 0],   salti: [4, 3] },
     { n: 6,  inizio: "2026-10-05", blocco: "Deload", acc: [8, 10], rir: [4, 4], traz: [3, 5], squat: [2, 5, 2.5],  stacco: [2, 5, -5],  salti: null, deload: true, nota: "Deload: niente salti, niente tecniche." },
-    { n: 7,  inizio: "2026-10-12", blocco: "Forza",  acc: [6, 10],  rir: [1, 2], traz: [4, 8], squat: [4, 4, 10],   stacco: [3, 4, 2.5],   salti: [5, 3], balzi: true, nota: "Inizia il blocco Forza. In C: panca piana al posto dell'inclinata, più i balzi." },
-    { n: 8,  inizio: "2026-10-19", blocco: "Forza",  acc: [6, 10],  rir: [1, 2], traz: [4, 8], squat: [4, 4, 12.5], stacco: [3, 4, 5], salti: [5, 3], balzi: true },
-    { n: 9,  inizio: "2026-10-26", blocco: "Forza",  acc: [6, 10],  rir: [1, 2], traz: [4, 8], squat: [4, 4, 15],   stacco: [3, 4, 7.5],   salti: [5, 3], balzi: true, trazTestIn: "B", nota: "Test trazioni in B: una sola serie a cedimento al posto delle serie normali." },
-    { n: 10, inizio: "2026-11-02", blocco: "Forza",  acc: [6, 10],  rir: [1, 1], traz: [4, 9], squat: [4, 4, 17.5], stacco: [3, 4, 10], salti: [5, 3], balzi: true },
-    { n: 11, inizio: "2026-11-09", blocco: "Forza",  acc: [6, 10],  rir: [1, 1], traz: [4, 9], squat: [4, 4, 20],   stacco: [3, 4, 12.5],   salti: [5, 3], balzi: true },
+    { n: 7,  inizio: "2026-10-12", blocco: "Forza", onda: "F",  acc: [6, 10],  rir: [1, 2], traz: [4, 8], squat: [4, 4, 10],   stacco: [3, 4, 2.5],   salti: [5, 3], balzi: true, nota: "Inizia il blocco Forza. In C: panca piana al posto dell'inclinata, più i balzi." },
+    { n: 8,  inizio: "2026-10-19", blocco: "Forza", onda: "I",  acc: [6, 10],  rir: [1, 2], traz: [4, 8], squat: [4, 4, 12.5], stacco: [3, 4, 5], salti: [5, 3], balzi: true },
+    { n: 9,  inizio: "2026-10-26", blocco: "Forza", onda: "F",  acc: [6, 10],  rir: [1, 2], traz: [4, 8], squat: [4, 4, 15],   stacco: [3, 4, 7.5],   salti: [5, 3], balzi: true, trazTestIn: "B", nota: "Test trazioni in B: una sola serie a cedimento al posto delle serie normali." },
+    { n: 10, inizio: "2026-11-02", blocco: "Forza", onda: "I",  acc: [6, 10],  rir: [1, 1], traz: [4, 9], squat: [4, 4, 17.5], stacco: [3, 4, 10], salti: [5, 3], balzi: true },
+    { n: 11, inizio: "2026-11-09", blocco: "Forza", onda: "F",  acc: [6, 10],  rir: [1, 1], traz: [4, 9], squat: [4, 4, 20],   stacco: [3, 4, 12.5],   salti: [5, 3], balzi: true },
     { n: 12, inizio: "2026-11-16", blocco: "Deload", acc: [8, 10],  rir: [4, 4], traz: [3, 5], squat: [2, 4, 12.5], stacco: [2, 4, 2.5],   salti: null, deload: true, nota: "Deload: niente salti, niente tecniche." },
-    { n: 13, inizio: "2026-11-23", blocco: "Picco",  acc: [6, 8],  rir: [1, 1], traz: [4, 10], squat: [4, 3, 22.5], stacco: [3, 3, 17.5], salti: [4, 3], balzi: true, trazTestIn: "B", nota: "Test trazioni in B: una sola serie a cedimento al posto delle serie normali." },
-    { n: 14, inizio: "2026-11-30", blocco: "Picco",  acc: [6, 8],  rir: [1, 1], traz: [4, 10], squat: [4, 3, 27.5], stacco: [3, 3, 20],   salti: [4, 3], balzi: true, nota: "Stop tecniche intensive." },
+    { n: 13, inizio: "2026-11-23", blocco: "Picco", onda: "F",  acc: [6, 8],  rir: [1, 1], traz: [4, 10], squat: [4, 3, 22.5], stacco: [3, 3, 17.5], salti: [4, 3], balzi: true, trazTestIn: "B", nota: "Test trazioni in B: una sola serie a cedimento al posto delle serie normali." },
+    { n: 14, inizio: "2026-11-30", blocco: "Picco", onda: "I",  acc: [6, 8],  rir: [1, 1], traz: [4, 10], squat: [4, 3, 27.5], stacco: [3, 3, 20],   salti: [4, 3], balzi: true, nota: "Stop tecniche intensive." },
     { n: 15, inizio: "2026-12-07", blocco: "Taper",  acc: [6, 8],  rir: [2, 3], traz: [3, 7], squat: [2, 3, 25],   stacco: [2, 3, 15], salti: null, taper: true, nota: "Metà volume, niente salti, niente cedimento." },
     { n: 16, inizio: "2026-12-14", blocco: "Test",   acc: [6, 8],  rir: [0, 0], traz: "max",  squat: [1, 3, 30],   stacco: [1, 3, 25], salti: null, test: true, taper: true, trazTestIn: "B", testAccessori: { "B.panca": 28, "C.laterali": 14 }, nota: "Settimana dei test: lunedì A (squat 130 × 3), martedì B (prima panca 28 × 8, trazioni al massimo a fine seduta), giovedì C (stacco 115 × 3, 120 se la schiena resta a 0-1 su 10, + laterali 14 × 12). Un solo tentativo per test; accessori leggeri." }
   ],
@@ -74,8 +77,9 @@ globalThis.PROGRAMMA = {
       nome: "Upper spinta",
       riscaldamento: "6': vogatore, band pull-apart, rotazioni spalle.",
       esercizi: [
+        { id: "B.pancaF", n: "0", nome: "Panca piana manubri pesante", tipo: "accessorio", serie: 4, range: [5, 6], kg: 24, inc: 2, rirMin: 2, onda: "F", nota: "Settimana di forza: per prima, da sola, recupero 2-3 minuti. Manubri appoggiati sulle cosce e portati su rotolando indietro. Partenza 24 kg, stimata dal tuo 22 × 10. Storia a parte: non cambia il carico della panca 8-10." },
         { id: "B.trazioni", n: "0", nome: "Trazioni", tipo: "trazioni", nota: "Valgono solo a ROM identico alla prima ripetizione." },
-        { id: "B.panca", n: "1", nome: "Panca piana manubri", tipo: "accessorio", serie: 4, range: [8, 10], kg: 20, inc: 2, nota: "Resta 8-10 in ogni blocco. +2 kg solo dopo 4 x 10 con RIR almeno 1 su tutte. Scapole addotte e depresse, gomiti a 45-60 gradi." },
+        { id: "B.panca", n: "1", nome: "Panca piana manubri", tipo: "accessorio", serie: 4, range: [8, 10], kg: 20, inc: 2, onda: "I", nota: "Resta 8-10 in ogni blocco. +2 kg solo dopo 4 x 10 con RIR almeno 1 su tutte. Scapole addotte e depresse, gomiti a 45-60 gradi." },
         { id: "B.lat", n: "2A", nome: "Lat machine", tipo: "accessorio", serie: 3, range: [10, 12], kg: 60, inc: 5, cal: true, nota: "Fasce e presa a uncino se gli avambracci cedono." },
         { id: "B.tricipiti", n: "2B", nome: "Estensioni tricipiti sopra la testa, cavi", tipo: "accessorio", serie: 3, range: [10, 12], kg: null, inc: 2.5, nota: "Gomiti fermi, non aprirli." },
         { id: "B.pulley", n: "3A", nome: "Pulley basso", tipo: "accessorio", serie: 3, range: [10, 12], kg: 50, inc: 5, cal: true },

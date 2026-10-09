@@ -92,6 +92,18 @@ Se due livelli sono in conflitto, vince quello più in alto, e lo dici in una ri
   bilanciere vicino alle gambe e la schiena in posizione, e non deve arrivare
   allo stacco già stanco. Superserie solo sugli accessori, mai su squat, stacco
   e trazioni.
+- Settimane a onda (dal 9 ottobre 2026, settimane 7-14): settimane di forza
+  (F: 7, 9, 11, 13) e di ipertrofia (I: 8, 10, 14) alternate. Nelle F la seduta
+  B si apre con la panca manubri pesante (B.pancaF, 4 x 5-6, RIR almeno 2,
+  da sola, prima delle trazioni, recupero 2-3 minuti) al posto della panca
+  8-10; nelle I torna la panca 8-10. Scarico, rifinitura e test non hanno onda.
+  Lo voleva l'atleta (serie da almeno 5 ripetizioni su un esercizio
+  principale, da solo, per caricare di più). Scelte: manubri e non bilanciere,
+  perché il test di dicembre è con i manubri e un gesto nuovo visto 4 volte in
+  7 settimane non si consolida (parere di Gemini, accettato); il bilanciere
+  resta come alternativa con storia propria. Squat e stacco non cambiano: sono
+  già pesanti ogni settimana (4 x 4, 3 x 4). Military e rematore restano 8-10
+  (manubri instabili sotto le 8; C ha già lo stacco).
 - Una sola tecnica intensiva per seduta (es. rest-pause, drop set), solo
   sull'ultima serie di un isolamento, dal blocco Forza. Mai in deload, taper,
   test; stop dalla settimana 14.
@@ -510,7 +522,7 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
 - RIR: ROM che si accorcia in alto = RIR 0-1. Esercizio in superserie con le
   laterali in A.
 
-### Panca piana manubri (B.panca, C.panca dalla settimana 7)
+### Panca piana manubri (B.panca, C.panca dalla settimana 7, B.pancaF nelle settimane di forza)
 - Muscoli: grande pettorale, deltoide anteriore, tricipiti.
 - Esecuzione: portali su con le ginocchia, sdraiati; scapole addotte e depresse
   (strette e basse) per tutta la serie, piccolo arco toracico, piedi a terra;
@@ -529,6 +541,12 @@ come leggere il RIR. Gli id sono quelli di `programma.js`.
 - RIR: la ripetizione rallenta molto a metà spinta o i manubri si separano
   instabili = RIR 0-1. Si perde in genere circa una ripetizione a serie: se la
   prima serie è a RIR 2, l'ultima sarà a RIR 0-1. Recupero 2,5-3 minuti.
+- Versione pesante (B.pancaF, 4 x 5-6): storia separata, non sposta il carico
+  della panca 8-10 né quello di C. Partenza 24 kg (stimata da 22 x 10); +2 kg
+  quando 4 x 6 con RIR almeno 2. Con manubri pesanti: appoggiali sulle cosce,
+  rotola indietro portandoli su con le ginocchia, a fine serie scendi in
+  sicurezza (ginocchia al petto e rotola su). Mai sotto RIR 2: senza
+  assistente un manubrio pesante che cede sul petto è pericoloso.
 
 ### Lat machine (B.lat)
 - Muscoli: gran dorsale, grande rotondo, bicipiti, romboidi.

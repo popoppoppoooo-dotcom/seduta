@@ -61,6 +61,9 @@
       if (e.fino && w.n > e.fino) return false;
       if (e.conD && !conD) return false;
       if (e.senzaD && conD) return false;
+      // settimane a onda: onda "F" = solo nelle settimane di forza, "I" = in tutte le altre
+      if (e.onda === "F" && w.onda !== "F") return false;
+      if (e.onda === "I" && w.onda === "F") return false;
       if (e.tipo === "salti") {
         if (!w.salti) return false;
         if (e.id.endsWith("balzi") && !w.balzi) return false;
@@ -91,7 +94,11 @@
     return def.range.slice();
   }
   // in scarico, rifinitura e settimana dei test gli esercizi non testati restano lontani dal cedimento
-  const rirDi = (def, w) => (w.deload || w.taper ? [Math.max(w.rir[0], 3), Math.max(w.rir[1], 4)] : w.rir.slice());
+  const rirDi = (def, w) => {
+    const r = w.deload || w.taper ? [Math.max(w.rir[0], 3), Math.max(w.rir[1], 4)] : w.rir.slice();
+    // rirMin: esercizi pesanti a poche ripetizioni restano almeno a quel margine
+    return def.rirMin ? [Math.max(r[0], def.rirMin), Math.max(r[1], def.rirMin)] : r;
+  };
 
   // ---------- bilanciere (squat, stacco) ----------
   function kgTabella(P, lift, n) {

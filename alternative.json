@@ -508,7 +508,7 @@
       "quando": "occupato",
       "nota": "Scapole strette e basse, bilanciere al petto basso.",
       "inc": 2.5,
-      "kgDa": "≈ 2 volte il peso di un manubrio, meno 5-10 kg (es. 20 kg per mano → 30-35 kg)"
+      "kgDa": "≈ 2 volte il peso di un manubrio, più 5-10% (es. 20 kg per mano → circa 40-45 kg)"
     },
     {
       "id": "alt.piegamentiZavorrati",
@@ -1227,6 +1227,32 @@
       "nota": "Elastico fissato in alto, gomiti fermi; serie lunghe.",
       "inc": 0,
       "kgDa": "elastico medio, ripetizioni a RIR 1-2"
+    }
+  ],
+  "B.pancaF": [
+    {
+      "id": "alt.pancaBilancierePesante",
+      "nome": "Panca piana bilanciere",
+      "quando": "entrambi",
+      "nota": "Se preferisci il bilanciere per caricare di più. Scapole strette e basse, bilanciere al petto basso, piedi a terra. Senza assistente lascia sempre almeno 2 ripetizioni in riserva e usa i fermi di sicurezza.",
+      "inc": 2.5,
+      "kgDa": "circa 2 volte il peso di un manubrio, più 5-10% (es. 24 kg per mano → circa 50 kg), da sistemare alla prima serie"
+    },
+    {
+      "id": "alt.chestPressPesante",
+      "nome": "Chest press alla macchina",
+      "quando": "occupato",
+      "nota": "Maniglie all'altezza del petto, scapole strette sullo schienale.",
+      "inc": 5,
+      "kgDa": "da trovare"
+    },
+    {
+      "id": "alt.pancaManubriPresaNeutraPesante",
+      "nome": "Panca manubri presa neutra",
+      "quando": "dolore",
+      "nota": "Palmi uno verso l'altro, gomiti a 30-45 gradi: meno stress sulla spalla anteriore.",
+      "inc": 2,
+      "kgDa": "≈ 90-100% del peso abituale"
     }
   ]
 }

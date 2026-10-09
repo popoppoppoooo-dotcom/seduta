@@ -127,7 +127,7 @@
     const d = oggi();
     const w = M.settimanaDi(P, d);
     const pr = M.prossimaSeduta(P, S.sedute, d, { forma: S.forma });
-    let h = `<h1>${w ? `Settimana ${w.n} · ${esc(w.blocco)}` : "Fuori programma"}</h1>`;
+    let h = `<h1>${w ? `Settimana ${w.n} · ${esc(w.blocco)}${ondaTxt(w)}` : "Fuori programma"}</h1>`;
     if (w) {
       h += `<p class="tenue">${dataBreve(d)} · RIR ${w.rir[0]}${w.rir[1] !== w.rir[0] ? "-" + w.rir[1] : ""}${w.deload ? " · scarico" : ""}</p>`;
       if (w.nota) h += `<div class="avviso">${esc(w.nota)}</div>`;
@@ -159,7 +159,7 @@
     const d = oggi(), w = M.settimanaDi(P, d);
     let h = `<p><a href="#" data-az="vai" data-v="oggi">← Allenamento</a></p><h1>Piano della settimana</h1>`;
     if (!w) { vista.innerHTML = h + "<p>Fuori programma.</p>"; return; }
-    h += `<p class="tenue">Settimana ${w.n} (${dataBreve(w.inizio)}) · ${esc(w.blocco)}</p>`;
+    h += `<p class="tenue">Settimana ${w.n} (${dataBreve(w.inizio)}) · ${esc(w.blocco)}${ondaTxt(w)}</p>`;
     h += cartaObiettivi(d, w);
     h += `<div class="card"><b>Giorni consigliati</b><p class="tenue" style="font-size:14px">Bachata il martedì sera, tennis il sabato. Ordine A → B → C (→ D). Mai A e C in giorni consecutivi; niente A o C il venerdì.<br>4 sedute: lun A · mer B · gio C · dom D (oppure ven D leggera).<br>3 sedute: lun A · mer B · gio C (o dom C).<br>Solo 2: C e A. L'app se ne accorge da sola quando i giorni non bastano: B salta, i tricipiti vanno in A (al posto dei polpacci) e le croci inverse in C.</p></div>`;
     for (const l of ["A", "B", "C", "D"]) {
@@ -316,6 +316,7 @@
     for (const l of Object.keys(P.sedute)) { const e = P.sedute[l].esercizi.find(x => x.id === id); if (e) return e; }
     return null;
   }
+  function ondaTxt(w) { return w.onda === "F" ? " · panca pesante" : w.onda === "I" ? " · panca 8-10" : ""; }
   function altPer(v) { return S.alternative[v.alPostoDi || v.id] || []; }
   function sottopannello(v, alt) {
     if (S.sotto.tipo === "info") {
@@ -546,7 +547,7 @@
     parti.push(await caricaSapere());
     if (S.imp.profilo) parti.push("# Profilo dell'utente (privato)\n" + S.imp.profilo);
     let st = `# Situazione al ${d} (${dataBreve(d)})\n`;
-    if (w) st += `Settimana ${w.n} di 16, blocco ${w.blocco}, RIR previsto ${w.rir.join("-")}, range accessori multiarticolari ${w.acc.join("-")}. ${w.nota || ""}\n`;
+    if (w) st += `Settimana ${w.n} di 16, blocco ${w.blocco}${w.onda ? (w.onda === "F" ? " (settimana di forza: in B panca manubri pesante 4×5-6 per prima)" : " (settimana di ipertrofia: panca 8-10)") : ""}, RIR previsto ${w.rir.join("-")}, range accessori multiarticolari ${w.acc.join("-")}. ${w.nota || ""}\n`;
     st += `Sedute fatte questa settimana: ${pr.fatte.join(", ") || "nessuna"}. Prossima consigliata: ${pr.scelta || "nessuna"}. ${pr.avvisi.join(" ")}\n`;
     if (S.bozza) st += `\n## Seduta in corso (${S.bozza.seduta})\n` + S.bozza.ordine.map(id => {
       const v = S.bozza.esercizi[id];
@@ -570,7 +571,7 @@
     const fotoDate = S.corpo.filter(x => x.foto && Object.keys(x.foto).length).map(x => x.data);
     st += `\nFoto del fisico salvate nelle date: ${fotoDate.join(", ") || "nessuna"} (le vedi solo se allegate al messaggio).\n`;
     st += `\n## Programma\nIl motore dell'app calcola i carichi con regole fisse (vedi sopra). Se proponi modifiche al programma, scrivile come elenco di cambi concreti (esercizio, serie, ripetizioni, carico, da quale settimana): l'utente le passerà al Mac per aggiornare programma.js.\n`;
-    st += P.settimane.map(s => `Sett. ${s.n} (${s.inizio}) ${s.blocco}: squat ${Array.isArray(s.squat) ? s.squat[0] + "×" + s.squat[1] + " @ " + (P.base.squat + s.squat[2]) : s.squat}, stacco ${Array.isArray(s.stacco) ? s.stacco[0] + "×" + s.stacco[1] + " @ " + (P.base.stacco + s.stacco[2]) : s.stacco}, trazioni ${Array.isArray(s.traz) ? s.traz.join("×") : s.traz}`).join("\n");
+    st += P.settimane.map(s => `Sett. ${s.n} (${s.inizio}) ${s.blocco}${s.onda ? " " + s.onda : ""}: squat ${Array.isArray(s.squat) ? s.squat[0] + "×" + s.squat[1] + " @ " + (P.base.squat + s.squat[2]) : s.squat}, stacco ${Array.isArray(s.stacco) ? s.stacco[0] + "×" + s.stacco[1] + " @ " + (P.base.stacco + s.stacco[2]) : s.stacco}, trazioni ${Array.isArray(s.traz) ? s.traz.join("×") : s.traz}`).join("\n");
     parti.push(st);
     return parti.filter(Boolean).join("\n\n---\n\n");
   }
