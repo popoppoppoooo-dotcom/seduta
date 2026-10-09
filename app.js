@@ -44,7 +44,7 @@
     vista: "oggi", sedute: [], corpo: [], chat: [], imp: {}, bozza: null,
     alternative: {}, sapere: "", forma: "ok", pront: {}, riepilogo: null, allegati: [], inCorso: null, sotto: null
   };
-  const IMP0 = { modello: "gemini-flash-latest", chiave: "", profilo: "", tema: "auto", ultimoBackup: null };
+  const IMP0 = { modello: "gemini-3.8-flash", chiave: "", profilo: "", tema: "auto", ultimoBackup: null };
 
   // ---------------- utilità ----------------
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -81,7 +81,7 @@
     c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
     return new Promise(ok => c.toBlob(ok, "image/jpeg", q));
   }
-  async function salvaImp() { await DB.kvMetti("imp", S.imp); }
+  async function salvaImp() { await salvaImp(); }
   // storico per i calcoli: dopo "Palestra nuova" macchine e cavi ripartono da zero (lo storico vero resta)
   const sto = () => M.perPalestra(P, S.sedute, S.imp.nuovaPalestra);
   let timerBozza;
@@ -91,6 +91,8 @@
   async function avvio() {
     try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (_) {}
     S.imp = Object.assign({}, IMP0, (await DB.kv("imp")) || {});
+    // vecchi predefiniti (2.5 non è più dato agli utenti nuovi): passa a 3.8 Flash
+    if (!S.imp.modello || /^gemini-(flash-latest|2\.|1\.)/.test(S.imp.modello)) { S.imp.modello = IMP0.modello; await salvaImp(); }
     S.bozza = (await DB.kv("bozza")) || null;
     S.sedute = await DB.tutti("sedute");
     S.corpo = await DB.tutti("corpo");

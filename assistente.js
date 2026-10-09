@@ -23,11 +23,14 @@
       // le cause più comuni, dal testo di Google
       if (/has not been used|is disabled|SERVICE_DISABLED/i.test(msg)) return "La chiave è in un progetto Google dove l'API Gemini non è attiva (403). Crea la chiave da aistudio.google.com/apikey (\"Create API key in new project\"): lì l'API è già attiva.";
       if (/referer|referrer|API_KEY_.*BLOCKED|restrict/i.test(msg)) return "La chiave ha delle restrizioni (siti o API consentiti) che bloccano l'app (403). Togli le restrizioni dalla chiave nella console Google, o creane una nuova da AI Studio senza restrizioni.";
+      if (/location is not supported/i.test(msg)) return "Google non offre l'API Gemini dal luogo o dalla rete da cui chiami (403): spegni VPN o relay privato e riprova, o usa \"Manda all'app Gemini\".";
       if (/leaked/i.test(msg)) return "Google ha bloccato questa chiave perché risulta pubblicata da qualche parte (403). Cancellala e creane una nuova in AI Studio, senza incollarla in chat o file condivisi.";
       if (/suspended|billing/i.test(msg)) return "Il progetto Google della chiave è sospeso o ha un problema di fatturazione (403). Crea la chiave in un progetto nuovo, senza fatturazione.";
       return "Chiave senza permesso per questo modello (403). Prova \"Trova modelli\" in Altro → Assistente e scegline un altro. Dettaglio di Google: " + msg;
     }
-    if (stato === 404) return "Modello non trovato (404): in Altro → Assistente tocca \"Trova modelli\" e scegline uno.";
+    // 404 senza testo: Google lo dà per qualche decina di secondi dopo molte richieste di fila
+    if (stato === 404 && !corpo.trim()) return "Google non risponde per ora (404 senza dettagli, succede dopo molte richieste di fila): riprova tra un minuto.";
+    if (stato === 404) return "Modello non disponibile (404): in Altro → Assistente scrivi gemini-3.8-flash o tocca \"Trova modelli\". Dettaglio di Google: " + msg;
     if (stato === 429) return "Quota gratuita esaurita per ora (429): riprova tra qualche minuto, o usa \"Manda all'app Gemini\".";
     if (stato >= 500) return "Il servizio di Google non risponde (" + stato + "): riprova tra poco.";
     return "Errore " + stato + ": " + msg;
@@ -47,12 +50,21 @@
       contents,
       generationConfig: { temperature: 0.5, maxOutputTokens: 8192 }
     };
-    const r = await fetch(`${BASE}/models/${encodeURIComponent(modello)}:streamGenerateContent?alt=sse`, {
+    const chiama = () => fetch(`${BASE}/models/${encodeURIComponent(modello)}:streamGenerateContent?alt=sse`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": chiave },
       body: JSON.stringify(corpo),
       signal
     });
+    let r = await chiama();
+    // 404 vuoto o 503: blocchi momentanei di Google; un solo nuovo tentativo
+    // (insistere allunga il blocco, secondo il parere di Gemini del 9 ottobre 2026)
+    if (r.status === 503 || r.status === 404) {
+      const testoErr = await r.text();
+      if (r.status === 404 && testoErr.trim()) throw new Error(erroreLeggibile(404, testoErr));
+      await new Promise(ok => setTimeout(ok, 5000));
+      r = await chiama();
+    }
     if (!r.ok) throw new Error(erroreLeggibile(r.status, await r.text()));
     const lettore = r.body.getReader();
     const dec = new TextDecoder();
