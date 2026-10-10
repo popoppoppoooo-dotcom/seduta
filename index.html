@@ -92,6 +92,11 @@ nav button[aria-current="true"] { color: var(--acc); }
 .ok { height: 48px; border-radius: 10px; border: 2px solid var(--riga); font-size: 22px; color: var(--tx3); }
 .ok.si { background: var(--ok); border-color: var(--ok); color: #06210f; }
 .serie.fatta .passo { border-color: var(--ok); }
+.serie.scalo { margin-top: 4px; }
+.serie.scalo .n { color: var(--tx3); font-size: 15px; }
+.serie.scalo .passo { height: 42px; border-style: dashed; }
+.serie .togli { height: 42px; border-radius: 10px; border: 1px solid var(--riga); background: var(--pan2); color: var(--tx2); font-size: 16px; }
+.scalo-tot { font-size: 12px; color: var(--tx3); text-align: right; margin-top: 3px; padding-right: 2px; }
 .rir { grid-column: 2 / 5; display: flex; gap: 4px; align-items: center; font-size: 12px; color: var(--tx3); }
 .rir button { flex: 1; height: 34px; border-radius: 8px; background: var(--pan2); border: 1px solid var(--riga); font: 600 14px var(--mono); color: var(--tx2); }
 .rir.pront { margin-top: 4px; }
@@ -137,6 +142,38 @@ td.num, th.num { text-align: right; font-family: var(--mono); }
 
 .toast { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); transform: translateX(-50%); background: var(--tx); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; z-index: 30; max-width: 90vw; }
 pre.testo { white-space: pre-wrap; font: 13px/1.5 var(--mono); background: var(--pan2); padding: 10px; border-radius: 10px; margin: 8px 0; }
+/* andamento */
+.kpi-griglia { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.kpi { background: var(--pan); border: 1px solid var(--riga); border-radius: var(--r); padding: 12px; }
+.kpi-e { font-size: 12px; color: var(--tx2); }
+.kpi-v { font: 700 28px var(--mono); letter-spacing: -1px; color: var(--tx); margin: 2px 0; }
+.kpi-v small { font-size: 14px; color: var(--tx3); letter-spacing: 0; }
+.kpi-s { font-size: 12px; color: var(--tx3); }
+.multipli { display: grid; grid-template-columns: 1fr; gap: 0 8px; }
+@media (min-width: 560px) { .multipli { grid-template-columns: 1fr 1fr; } }
+.card.mini { margin: 6px 0; }
+.mini-v { font: 700 16px var(--mono); color: var(--tx); }
+.graf-box { position: relative; margin-top: 6px; touch-action: pan-y; }
+.graf { width: 100%; height: auto; display: block; overflow: visible; }
+.graf .griglia { stroke: var(--riga); stroke-width: 1; }
+.graf .griglia.rif { stroke: var(--tx3); stroke-dasharray: 3 3; }
+.graf .asse { fill: var(--tx3); font: 10px var(--mono); }
+.graf .linea { fill: none; stroke: var(--acc); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.graf .punto { fill: var(--acc); stroke: var(--pan); stroke-width: 2; }
+.graf .barra { fill: var(--tx3); opacity: .55; }
+.graf .barra-ora { fill: var(--acc); }
+.graf .croce { stroke: var(--tx2); stroke-width: 1; }
+.graf .croce-p { fill: var(--acc); stroke: var(--pan); stroke-width: 2; }
+.suggerimento { position: absolute; top: -6px; transform: translateY(-100%); background: var(--tx); color: var(--bg); font-size: 12px; padding: 4px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none; }
+.muscoli { margin-top: 8px; }
+.mu-riga { display: grid; grid-template-columns: 9.5em 1fr 2.6em; gap: 8px; align-items: center; margin: 6px 0; font-size: 13px; }
+.mu-nome { color: var(--tx2); }
+.mu-pista { position: relative; height: 14px; }
+.mu-banda { position: absolute; top: 0; bottom: 0; background: var(--pan2); border-radius: 4px; }
+.mu-barra { position: absolute; left: 0; top: 2px; bottom: 2px; background: var(--acc); border-radius: 0 4px 4px 0; min-width: 2px; }
+.mu-v { font: 600 13px var(--mono); text-align: right; color: var(--tx); }
+.st-su, .st-fermo, .st-giu, .st-stabile { white-space: nowrap; font-size: 13px; }
+.st-su { color: var(--ok); } .st-fermo { color: var(--warn); } .st-giu { color: var(--err); } .st-stabile { color: var(--tx2); }
 .nascosto { display: none !important; }
 </style>
 </head>
@@ -145,12 +182,15 @@ pre.testo { white-space: pre-wrap; font: 13px/1.5 var(--mono); background: var(-
 <nav id="nav">
   <button data-vai="oggi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Allenamento</button>
   <button data-vai="corpo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19h16M7 15l3-4 3 2 4-6"/></svg>Corpo</button>
+  <button data-vai="andamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V12M10 20V6M15 20v-9M20 20V9"/></svg>Andamento</button>
   <button data-vai="coach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Coach</button>
   <button data-vai="altro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Altro</button>
 </nav>
 <script src="programma.js"></script>
 <script src="motore.js"></script>
 <script src="assistente.js"></script>
+<script src="drive.js"></script>
+<script src="andamento.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

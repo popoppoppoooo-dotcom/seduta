@@ -420,3 +420,30 @@ test("tetto: la stima non basta, serve la serie vera", () => {
   const sq = trova(M.pianoSeduta(P, "A", "2027-02-01", st), "A.squat");
   assert.equal(sq.rip.length, 4); assert.doesNotMatch(sq.motivo, /Tetto/);
 });
+
+// Serie divisa (10 ottobre 2026): parte al carico pieno, finisce le ripetizioni con uno scalo.
+const conScalo = (righe, extra = {}) => Object.assign({ serie: righe.map(([kg, rip, drop]) => ({ kg, rip, rir: null, drop: drop ? [{ kg: drop[0], rip: drop[1] }] : undefined })) }, extra);
+test("serie divisa: resta al carico pieno con lo stesso obiettivo, non scende", () => {
+  const st = [sed("2026-10-12", 7, "A", { "A.laterali": conScalo([[12, 9, [10, 3]], [12, 8, [10, 4]], [12, 7, [10, 5]], [12, 7, [10, 5]]], { ripTarget: [12, 12, 12, 12], range: [12, 15] }) })];
+  const e = trova(M.pianoSeduta(P, "A", "2026-10-19", st), "A.laterali");
+  assert.equal(e.kg, 12); // senza la regola nuova "tutte sotto 12" lo avrebbe fatto scendere a 10
+  assert.deepEqual(e.rip, [12, 12, 12, 12]);
+  assert.match(e.motivo, /diviso la serie \(12×9\+10×3\)/);
+});
+test("serie divisa: tutte in cima al range senza scalo -> sale come sempre", () => {
+  const st = [
+    sed("2026-10-12", 7, "A", { "A.laterali": conScalo([[12, 9, [10, 3]], [12, 8, [10, 4]], [12, 8, [10, 4]], [12, 8, [10, 4]]], { ripTarget: [12, 12, 12, 12], range: [12, 15] }) }),
+    sed("2026-10-19", 8, "A", { "A.laterali": es([[12, 15, 1], [12, 15, 1], [12, 15, 1], [12, 15, 1]], { ripTarget: [12, 12, 12, 12], range: [12, 15] }) })];
+  assert.equal(trova(M.pianoSeduta(P, "A", "2026-10-26", st), "A.laterali").kg, 14);
+});
+test("serie divisa: testo del taccuino, ripetizioni totali e tonnellaggio", () => {
+  const s = { kg: 20, rip: 8, rir: 0, drop: [{ kg: 17.5, rip: 4 }] };
+  assert.equal(M.fmtSerie(s), "20×8+17,5×4 (0)");
+  assert.equal(M.ripTot(s), 12);
+  assert.equal(M.tonnellaggio(s), 230);
+  assert.equal(M.riga("Lat machine", { serie: [s, { kg: 20, rip: 12, rir: 1 }] }), "Lat machine — 20×8+17,5×4 (0), 20×12 (1)");
+});
+test("serie divisa sul bilanciere: conta come ripetizione mancata (la tabella scende)", () => {
+  const st = [sed("2026-10-12", 7, "A", { "A.squat": conScalo([[110, 4], [110, 3, [100, 1]], [110, 4], [110, 4]], { ripTarget: [4, 4, 4, 4] }) })];
+  assert.equal(trova(M.pianoSeduta(P, "A", "2026-10-19", st), "A.squat").kg, 105);
+});

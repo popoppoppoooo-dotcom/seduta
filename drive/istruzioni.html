@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Collegare Drive</title>
+<style>
+:root { --bg:#14110f; --pan:#1f1b18; --riga:#3a332d; --tx:#f3ece4; --tx2:#b8ab9d; --acc:#ff8a3d; --warn:#ffcc4d; color-scheme: dark; }
+@media (prefers-color-scheme: light) { :root { --bg:#f6f1ea; --pan:#fffaf4; --riga:#ddd0c1; --tx:#1d1712; --tx2:#5e5145; --acc:#d9601a; --warn:#9a6a00; color-scheme: light; } }
+body { margin:0; background:var(--bg); color:var(--tx); font:16px/1.55 system-ui,-apple-system,Roboto,sans-serif; }
+main { max-width:720px; margin:0 auto; padding:20px 16px 60px; }
+h1 { font-size:26px; margin:0 0 4px; } h2 { font-size:19px; margin:28px 0 8px; color:var(--acc); }
+.sub { color:var(--tx2); margin:0 0 18px; }
+.card { background:var(--pan); border:1px solid var(--riga); border-radius:14px; padding:12px 16px; margin:10px 0; }
+code { background:var(--riga); padding:1px 6px; border-radius:6px; font-size:14px; overflow-wrap:anywhere; }
+.nota { border-left:3px solid var(--warn); padding:6px 12px; color:var(--tx2); }
+li { margin:6px 0; }
+button { font:inherit; font-weight:600; background:var(--acc); color:#140c06; border:0; border-radius:10px; padding:10px 16px; cursor:pointer; }
+#esito { color:var(--tx2); margin-left:8px; }
+a { color:var(--acc); }
+</style>
+</head>
+<body><main>
+<h1>Collegare Work-out a Drive</h1>
+<p class="sub">Da fare una volta sola, dal computer, in circa 5 minuti. Dopo, ogni <b>Fine seduta</b> arriva da sola nella cartella <b>Assistenti/Palestra/Registro</b> del tuo Drive.</p>
+
+<div class="card"><p><b>Come funziona.</b> Crei un piccolo programma ("script") dentro il tuo account Google. Il telefono gli manda la seduta, e lui la scrive nel tuo Drive con il tuo account. Non passa da server di altri, e foto, chat e chiavi non partono mai.</p>
+<p>Arrivano tre cose: un file di testo per seduta (come sul taccuino), il foglio Google <b>Registro Work-out</b> (schede Sedute, Serie e Corpo) e <b>work-out-dati.json</b> (lo legge il coach sul Mac).</p></div>
+
+<h2>1. Crea il progetto</h2>
+<div class="card"><ol>
+<li>Apri <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com → Nuovo progetto</a> con lo stesso account Google del Drive.</li>
+<li>In alto a sinistra clicca su "Progetto senza titolo" e chiamalo <b>Work-out Drive</b>.</li>
+</ol></div>
+
+<h2>2. Incolla il codice</h2>
+<div class="card"><ol>
+<li>Clicca qui: <button id="copia" type="button">Copia il codice</button><span id="esito"></span><br>
+(oppure apri <a href="https://github.com/popoppoppoooo-dotcom/seduta/blob/main/drive/Codice.gs" target="_blank" rel="noopener">Codice.gs su GitHub</a>, seleziona tutto e copia).</li>
+<li>Nell'editor cancella le righe che ci sono (<code>function myFunction() {…}</code>) e incolla.</li>
+<li>Salva con l'icona del dischetto (o Cmd+S).</li>
+</ol></div>
+
+<h2>3. Dai i permessi</h2>
+<div class="card"><ol>
+<li>Nella barra in alto, nel menu accanto a "Debug", scegli <b>prova</b> e clicca <b>▶ Esegui</b>.</li>
+<li>Google chiede l'autorizzazione: <b>Rivedi autorizzazioni</b> → scegli il tuo account.</li>
+<li>Compare "Google non ha verificato questa app": clicca <b>Avanzate</b> → <b>Vai a Work-out Drive (non sicuro)</b> → <b>Consenti</b>.</li>
+<li>In basso, nel registro, deve comparire <code>Cartella pronta: Registro</code>.</li>
+</ol>
+<p class="nota">L'avviso "non verificata" compare per tutti gli script personali: Google verifica solo le app pubblicate per altre persone. Qui l'autore sei tu e lo script lavora solo sul tuo account. I permessi chiesti (Drive e Fogli) servono per creare i file nella cartella Registro.</p></div>
+
+<h2>4. Pubblica come app web</h2>
+<div class="card"><ol>
+<li>In alto a destra: <b>Esegui il deployment</b> → <b>Nuovo deployment</b>.</li>
+<li>Clicca l'ingranaggio accanto a "Seleziona tipo" → <b>App web</b>.</li>
+<li>Descrizione: <code>Work-out</code>. <b>Esegui come: Io</b>. <b>Chi ha accesso: Chiunque</b>.</li>
+<li>Clicca <b>Esegui il deployment</b> e copia l'<b>URL dell'app web</b>: finisce con <code>/exec</code>.</li>
+</ol>
+<p class="nota">"Chiunque" serve perché il telefono possa chiamare lo script senza un accesso Google. Lo script però accetta solo il tuo telefono: alla prima seduta registra un codice segreto generato dall'app e rifiuta qualsiasi altro codice.</p></div>
+
+<h2>5. Collega il telefono</h2>
+<div class="card"><ol>
+<li>Mandati l'indirizzo sul telefono (per esempio con una nota o una mail a te stesso).</li>
+<li>In Work-out: <b>Altro</b> → <b>Invio automatico a Drive</b> → incolla l'indirizzo → <b>Collega</b>.</li>
+<li>L'app carica subito tutte le sedute già fatte. Controlla su Drive: in <b>Assistenti/Palestra/Registro</b> ci sono i file e il foglio <b>Registro Work-out</b>.</li>
+</ol></div>
+
+<h2>Se qualcosa non va</h2>
+<div class="card"><ul>
+<li><b>"Lo script chiede l'accesso"</b>: nel deployment "Chi ha accesso" non è "Chiunque". Esegui il deployment → Gestisci deployment → matita → Chi ha accesso: Chiunque → Esegui il deployment.</li>
+<li><b>"Risposta strana dallo script"</b>: l'indirizzo è sbagliato. Deve essere quello dell'<b>app web</b> che finisce con <code>/exec</code>, non quello dell'editor.</li>
+<li><b>"Codice dell'app diverso"</b>: lo script è già legato a un altro telefono (o hai reinstallato l'app). In script.google.com → <b>Impostazioni progetto</b> (ingranaggio a sinistra) → <b>Proprietà dello script</b> → elimina <code>TOKEN</code> → Salva. La seduta successiva registra il nuovo codice.</li>
+<li><b>Senza rete</b>: niente di grave, le sedute restano in coda e partono appena c'è connessione (o quando riapri l'app).</li>
+<li><b>Hai cancellato un file o il foglio</b>: alla seduta successiva lo script lo ricrea.</li>
+</ul></div>
+
+<h2>Se un giorno aggiorno lo script</h2>
+<div class="card"><ol>
+<li>Incolla il codice nuovo al posto del vecchio e salva.</li>
+<li><b>Esegui il deployment</b> → <b>Gestisci deployment</b> → matita → Versione: <b>Nuova versione</b> → Esegui il deployment.</li>
+</ol>
+<p>L'indirizzo resta lo stesso: sul telefono non cambi niente.</p></div>
+</main>
+<script>
+document.getElementById("copia").addEventListener("click", async () => {
+  const esito = document.getElementById("esito");
+  try {
+    const r = await fetch("Codice.gs", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    await navigator.clipboard.writeText(await r.text());
+    esito.textContent = "Copiato ✓ — ora incollalo nell'editor.";
+  } catch (e) {
+    esito.textContent = "Non riesco a copiare: apri Codice.gs e copialo a mano.";
+  }
+});
+</script>
+</body>
+</html>

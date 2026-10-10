@@ -30,8 +30,9 @@ li { margin:4px 0; }
 <li>Dopo ogni serie: se è andata come previsto tocca <b>✓</b>. Se no, correggi prima con <b>−</b>/<b>+</b> (o scrivi il numero). Un carico corretto passa da solo alle serie successive.</li>
 <li>Il <b>RIR</b> (quante ripetizioni ti restavano: 0, 1, 2, 3, 4+) è <b>facoltativo</b>: se non lo tocchi l'app assume 2 e la progressione va avanti lo stesso. Segnalo quando serve: <b>0</b> (eri al limite: la volta dopo non sale) o <b>4+</b> sulla prima serie (troppo leggero: sale di più).</li>
 <li><b>Controllo della prima serie</b>: su squat e stacco, se la prima serie è molto più dura del previsto (ripetizioni mancate o RIR 2 sotto), l'app abbassa da sola le serie rimanenti al carico della settimana prima e te lo scrive.</li>
+<li><b>Dividi serie</b> (pensata per manubri, macchine e cavi): quando il peso nuovo è troppo per tutte le ripetizioni ma quello vecchio è troppo facile. Fai quante ripetizioni riesci al peso pieno, poi abbassi e finisci le altre fino all'obiettivo (es. 12). Tocca <b>Dividi serie</b> prima della serie: sotto compare una riga <b>↳</b> con il secondo peso (un gradino sotto) e le ripetizioni che mancano, che si ricalcolano quando correggi le prime. Sul taccuino diventa <code>12×9+10×3</code>. La volta dopo l'app ti lascia allo stesso peso pieno con lo stesso obiettivo: sali quando le fai tutte senza scalare. Su squat e stacco c'è lo stesso, ma lì conta solo il peso pieno: la serie divisa vale come ripetizioni mancate e il carico non sale.</li>
 <li>Macchina occupata? <b>Cambia</b>: scegli un'alternativa (con il suo carico, calcolato dalla volta che l'hai già fatta) o scrivi un esercizio a mano. Vale solo per oggi.</li>
-<li>Alla fine <b>Fine seduta</b>: ottieni il testo come sul taccuino, da copiare o condividere.</li>
+<li>Alla fine <b>Fine seduta</b>: ottieni il testo come sul taccuino, da copiare o condividere, e se hai collegato Drive la seduta parte da sola verso la cartella Registro ("Caricata su Drive ✓"). Senza rete resta in coda e parte appena c'è campo.</li>
 </ol>
 <p class="nota">Se chiudi l'app a metà, la seduta resta lì com'era. Il timer non c'è: vai a occhio.</p></div>
 
@@ -70,25 +71,37 @@ li { margin:4px 0; }
 <li><b>Come misurare</b>: metro da sarta non elastico, aderente senza stringere; due misure e la media. Le istruzioni punto per punto sono nella scheda Corpo. Senza metro va bene un cordino non elastico e un righello. Le misure sono facoltative: il peso e le foto contano di più.</li>
 </ul></div>
 
+<h2>Andamento</h2>
+<div class="card"><p>La scheda <b>Andamento</b> (barra in basso) si ricalcola a ogni Fine seduta:</p><ul>
+<li><b>Quattro numeri</b>: sedute delle ultime 4 settimane (su 12 previste), serie e tonnellaggio di questa settimana rispetto alla scorsa, record recenti.</li>
+<li><b>Sedute per settimana</b> nelle ultime 12 settimane.</li>
+<li><b>Forza stimata</b> di squat, stacco, panca, inclinata, trazioni e laterali: il massimo che potresti sollevare una volta, stimato dalla serie migliore di ogni seduta (trazioni: ripetizioni possibili). Tocca il grafico per leggere i valori.</li>
+<li><b>Serie a settimana per muscolo</b>, con la fascia 10-20 che serve per crescere.</li>
+<li><b>Chi sale e chi è fermo</b>: ogni esercizio guardando le ultime 4 volte.</li>
+<li>Peso medio settimanale e vita.</li></ul></div>
+
 <h2>Coach</h2>
 <div class="card"><p>Chiedi di esecuzione, dolori, alternative, peso, misure e foto. Il coach vede il programma, le ultime 4 settimane di sedute e i dati del corpo, più una base di conoscenze preparata sul Mac.</p>
 <ul>
-<li><b>Con la chiave Gemini</b> (gratuita) risponde dentro l'app. Se compare "Errore 402", la chiave è giusta ma sta in un progetto Google con fatturazione prepagata senza credito: in AI Studio crea la chiave in un <b>progetto nuovo, senza fatturazione</b>.</li>
+<li><b>Con OpenRouter</b> (consigliato) risponde DeepSeek v4.1 Flash, che legge anche le foto. Costa circa 1 centesimo la prima domanda di una chat (rilegge manuale, profilo e sedute) e 0,1-0,2 centesimi le successive; sotto ogni risposta vedi quanto è costata, e in Altro → Assistente la spesa del mese.</li>
+<li><b>Con la chiave Gemini</b> (gratuita) risponde dentro l'app, ma la chiave gratuita si blocca spesso dopo pochi messaggi ("Failed to fetch"). Se ci sono entrambe le chiavi e Gemini non risponde, la domanda passa da sola a OpenRouter.</li>
 <li><b>Senza chiave</b>: "Manda all'app Gemini" passa domanda e dati all'app Gemini del telefono.</li>
 </ul>
-<p class="nota">Con il livello gratuito Google può usare i messaggi per migliorare i suoi modelli: nelle foto del fisico evita il viso.</p></div>
+<p class="nota">I messaggi e le foto allegate vanno al servizio scelto (OpenRouter e DeepSeek, o Google): nelle foto del fisico evita il viso.</p></div>
 
 <h2>Da fare una volta sola</h2>
 <div class="card"><ol>
 <li><b>Sul Mac, nel Terminale</b>: <code>gh auth login</code> (GitHub.com → HTTPS → accedi con il browser). Poi dimmelo: pubblico l'app e ti do l'indirizzo.</li>
 <li><b>Sul Pixel</b>: apri l'indirizzo in Chrome → menu ⋮ → <b>Installa app</b>. Da lì funziona anche senza rete.</li>
-<li><b>Chiave Gemini</b>: <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a> → Create API key → in Work-out: Altro → Assistente → incolla.</li>
+<li><b>Chiave OpenRouter</b>: <a href="https://openrouter.ai/settings/keys">openrouter.ai/settings/keys</a> → Create key, nome "Work-out", <b>limite di credito 2 $</b> → in Work-out: Altro → Assistente → incolla. (In alternativa, gratis ma meno affidabile, la chiave Gemini da <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a>.)</li>
+<li><b>Invio automatico a Drive</b>: 5 minuti dal computer, seguendo le <a href="drive/istruzioni.html">istruzioni passo passo</a>. Poi ogni seduta arriva da sola in Assistenti/Palestra/Registro.</li>
 <li><b>Dati di partenza</b>: in Drive, cartella Assistenti/Palestra, c'è il file di import con profilo e carichi. Work-out → Altro → Importa → sceglilo da Drive.</li>
 <li><b>Niente distrazioni</b>: Altro → "Blocca l'app sullo schermo" spiega come fissare Work-out sul Pixel (serve il PIN per uscire).</li>
 </ol></div>
 
 <h2>Backup</h2>
-<div class="card"><p>I dati stanno solo sul telefono. Ogni settimana (l'app te lo ricorda): Altro → <b>Esporta</b> → Drive → cartella Assistenti/Palestra/Registro. Lo stesso file serve per ripristinare (Importa) e lo legge anche il coach sul Mac. La chiave Gemini non entra mai nel backup.</p></div>
+<div class="card"><p>Con Drive collegato, a ogni Fine seduta arrivano in <b>Assistenti/Palestra/Registro</b>: un file di testo per seduta, il foglio Google <b>Registro Work-out</b> (schede Sedute, Serie e Corpo) e <b>work-out-dati.json</b>, che legge il coach sul Mac. Foto e chat restano sul telefono.</p>
+<p>Il <b>backup completo</b> (Altro → Esporta → Drive) contiene anche foto e chat: fallo ogni tanto e prima di cambiare telefono; serve per ripristinare (Importa). Le chiavi e l'indirizzo dello script non entrano mai nel backup.</p></div>
 
 <h2>Cambiare il programma</h2>
 <div class="card"><p>Il programma sta in <code>~/seduta/programma.js</code>. Se il coach propone modifiche, portale a Claude sul Mac: le applica, controlla i test e ripubblica. Il telefono prende la versione nuova alla riapertura successiva.</p></div>

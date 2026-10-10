@@ -37,6 +37,13 @@
   const fatte = es => (es && !es.saltato ? (es.serie || []).filter(s => s && s.rip != null && s.rip >= 0) : []);
   const kgDi = es => moda(fatte(es).map(s => s.kg ?? 0));
   const fmtKg = kg => (kg == null ? "?" : String(+kg.toFixed(2)).replace(".", ","));
+  // Serie divisa (dal 10 ottobre 2026): parte al carico pieno, poi "scalo" a un peso più basso
+  // per finire le ripetizioni dell'obiettivo. kg e rip della serie restano quelli del carico pieno
+  // (contano per la progressione); gli scali stanno in s.drop = [{kg, rip}].
+  const scali = s => (s && Array.isArray(s.drop) ? s.drop.filter(d => d && d.rip > 0) : []);
+  const ripTot = s => (s.rip || 0) + scali(s).reduce((a, d) => a + d.rip, 0);
+  const tonnellaggio = s => (s.kg || 0) * (s.rip || 0) + scali(s).reduce((a, d) => a + (d.kg || 0) * d.rip, 0);
+  const fmtSerie = x => (x.kg ? `${fmtKg(x.kg)}×${x.rip}` : `${x.rip}`) + scali(x).map(d => `+${d.kg ? fmtKg(d.kg) + "×" : ""}${d.rip}`).join("") + (x.rir != null ? ` (${x.rir})` : "");
 
   // ---------- storico ----------
   // storico: [{id, data, sett, seduta, conD, esercizi: {exId: {serie:[{kg,rip,rir}], range, ripTarget, tecnica, saltato, deload}}}]
@@ -357,7 +364,9 @@
       const scalo = set.some((s, i) => i > iKu && (s.kg ?? ku) < ku);
       const tutteInCima = set.length >= Math.min(pianoN, def.serie) && ultimaRir != null && !scalo && set.every(s => (s.kg ?? ku) !== ku || (s.rip >= range[1] && (s.rir == null || s.rir >= 1)));
       const primaFacile = def.id !== "B.panca" && set[0] && set[0].rip >= range[1] && set[0].rir != null && set[0].rir >= 4 && (set[0].kg ?? ku) >= ku;
-      const tutteSotto = set.every(s => s.rip < range[0]);
+      // serie divise: al carico pieno non ce l'hai fatta, ma con lo scalo sì
+      const conScalo = set.some(s => scali(s).length);
+      const tutteSotto = set.every(s => s.rip < range[0]) && !set.some(s => scali(s).length && ripTot(s) >= range[0]);
       if (kAlto > kMod && !def.legatoA) {
         kg = ku; rips = Array(serieN).fill(range[0]);
         motivo = `L'ultima volta una serie a ${fmtKg(ku)} kg nel range: ora tutte a ${fmtKg(ku)} kg, da ${range[0]} ripetizioni.`;
@@ -368,6 +377,15 @@
         kg = ku + inc; rips = Array(serieN).fill(range[0]);
         motivo = `Tutte le serie a ${range[1]}: sali a ${fmtKg(ku + inc)} kg e riparti da ${range[0]}.`;
         if (def.id === "B.panca" && set.length < 4) { kg = ku; motivo = `Panca: si sale solo dopo 4 × ${range[1]}.`; rips = Array(serieN).fill(range[1]); }
+      } else if (conScalo && !def.legatoA) {
+        // resta al carico pieno con lo stesso obiettivo di ripetizioni totali: si scala sempre meno,
+        // finché tutte le serie arrivano in cima al range senza scalo (allora sale, regola sopra)
+        kg = ku;
+        const t = u.ripTarget && u.ripTarget.length ? u.ripTarget : [range[1]];
+        rips = [];
+        for (let i = 0; i < serieN; i++) rips.push(Math.min(range[1], Math.max(range[0], t[Math.min(i, t.length - 1)] ?? range[1])));
+        const es1 = set.find(s => scali(s).length);
+        motivo = `L'ultima volta hai diviso la serie (${fmtSerie(Object.assign({}, es1, { rir: null }))}): resta a ${fmtKg(ku)} kg con lo stesso obiettivo; scala solo quando non ce la fai, e prova a farne di più prima di scalare.`;
       } else if (tutteSotto && set.length >= 2) {
         kg = Math.max(inc, ku - inc); rips = Array(serieN).fill(range[0]);
         motivo = `L'ultima volta tutte le serie sotto ${range[0]}: scendi a ${fmtKg(kg)} kg.`;
@@ -634,7 +652,7 @@
   // ---------- testo stile taccuino ----------
   function riga(nome, es) {
     if (es.saltato) return `${nome} — saltato`;
-    const s = fatte(es).map(x => (x.kg ? `${fmtKg(x.kg)}×${x.rip}` : `${x.rip}`) + (x.rir != null ? ` (${x.rir})` : ""));
+    const s = fatte(es).map(fmtSerie);
     return `${nome} — ${s.join(", ")}${es.tecnica ? " [tecnica peggiorata]" : ""}${es.dolore ? " [dolore]" : ""}${es.nota ? " — " + es.nota : ""}`;
   }
   function testoSeduta(P, s) {
@@ -644,7 +662,7 @@
     return righe.join("\n");
   }
 
-  const Motore = { modoDue, perPalestra, rifCiclo, avvicinamento, dischi, progressoObiettivi, prontezza, massimaleTrazioni, defDi, pianoAlternativa, adattaForma, settimanaDi, settimana, eserciziDi, pianoSeduta, prossimaSeduta, testoSeduta, riga, storia, fatte, kgDi, e1rm, fmtKg, lunediDi, giorni };
+  const Motore = { scali, ripTot, tonnellaggio, fmtSerie, modoDue, perPalestra, rifCiclo, avvicinamento, dischi, progressoObiettivi, prontezza, massimaleTrazioni, defDi, pianoAlternativa, adattaForma, settimanaDi, settimana, eserciziDi, pianoSeduta, prossimaSeduta, testoSeduta, riga, storia, fatte, kgDi, e1rm, fmtKg, lunediDi, giorni };
   if (typeof module !== "undefined" && module.exports) module.exports = Motore;
   else root.Motore = Motore;
 })(typeof globalThis !== "undefined" ? globalThis : this);

@@ -1,8 +1,8 @@
-// Work-out (ex Seduta): interfaccia. Dati solo sul telefono (IndexedDB), backup su Drive
-// tramite il pannello "Condividi" di Android.
+// Work-out (ex Seduta): interfaccia. Dati sul telefono (IndexedDB); a ogni fine seduta
+// copia automatica su Google Drive (drive.js + drive/Codice.gs), backup completo con "Condividi".
 (function () {
   "use strict";
-  const P = globalThis.PROGRAMMA, M = globalThis.Motore, A = globalThis.Assistente;
+  const P = globalThis.PROGRAMMA, M = globalThis.Motore, A = globalThis.Assistente, G = globalThis.Drive;
   const $ = s => document.querySelector(s);
   const vista = $("#vista");
 
@@ -44,7 +44,13 @@
     vista: "oggi", sedute: [], corpo: [], chat: [], imp: {}, bozza: null,
     alternative: {}, sapere: "", forma: "ok", pront: {}, riepilogo: null, allegati: [], inCorso: null, sotto: null
   };
-  const IMP0 = { modello: "gemini-3.8-flash", chiave: "", profilo: "", tema: "auto", ultimoBackup: null };
+  const IMP0 = { fornitore: "", modello: "gemini-3.8-flash", chiave: "", modelloOR: "deepseek/deepseek-v4.1-flash", chiaveOR: "", profilo: "", tema: "auto", ultimoBackup: null };
+  // valori che restano solo su questo telefono: mai nei backup né su Drive
+  const SEGRETI = ["chiave", "chiaveOR", "driveUrl", "driveToken"];
+  const senzaSegreti = o => { const x = Object.assign({}, o); for (const k of SEGRETI) delete x[k]; return x; };
+  // fornitore del coach: quello scelto, altrimenti quello di cui c'è la chiave (OpenRouter se ci sono entrambe)
+  const fornitore = () => S.imp.fornitore || (S.imp.chiaveOR ? "openrouter" : S.imp.chiave ? "gemini" : "openrouter");
+  const chiaveAttiva = () => (fornitore() === "gemini" ? S.imp.chiave : S.imp.chiaveOR);
 
   // ---------------- utilità ----------------
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -81,11 +87,61 @@
     c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
     return new Promise(ok => c.toBlob(ok, "image/jpeg", q));
   }
-  async function salvaImp() { await salvaImp(); }
+  async function salvaImp() { await DB.kvMetti("imp", S.imp); }
   // storico per i calcoli: dopo "Palestra nuova" macchine e cavi ripartono da zero (lo storico vero resta)
   const sto = () => M.perPalestra(P, S.sedute, S.imp.nuovaPalestra);
   let timerBozza;
   function salvaBozza() { clearTimeout(timerBozza); timerBozza = setTimeout(() => DB.kvMetti("bozza", S.bozza), 250); }
+
+  // ---------------- invio a Drive ----------------
+  // La coda resta salvata finché lo script non conferma: senza rete parte alla prossima occasione
+  // (apertura dell'app, ritorno della rete, ritorno sull'app).
+  let invioDrive = null;
+  async function codaDrive() { return Object.assign({ cambiate: [], togli: [], sporco: false }, (await DB.kv("driveCoda")) || {}); }
+  async function segnaDrive(o) {
+    const c = await codaDrive();
+    if (o.cambiata && !c.cambiate.includes(o.cambiata)) c.cambiate.push(o.cambiata);
+    if (o.tolta) { c.cambiate = c.cambiate.filter(x => x !== o.tolta); if (!c.togli.includes(o.tolta)) c.togli.push(o.tolta); }
+    c.sporco = true;
+    await DB.kvMetti("driveCoda", c);
+  }
+  function sincronizzaDrive(tutto) {
+    if (!S.imp.driveUrl || !S.imp.driveToken) return Promise.resolve(null);
+    if (invioDrive) return invioDrive.then(() => sincronizzaDrive(tutto));
+    invioDrive = (async () => {
+      const c = await codaDrive();
+      if (tutto) { c.cambiate = S.sedute.filter(x => !x.iniziale).map(x => x.id); c.sporco = true; }
+      if (!c.sporco && !c.cambiate.length && !c.togli.length) return null;
+      if (navigator.onLine === false) { S.drive = { stato: "coda", n: c.cambiate.length }; return null; }
+      S.drive = { stato: "invio" }; aggiornaDrive();
+      try {
+        const r = await G.invia(S.imp.driveUrl, S.imp.driveToken, G.pacchetto(P, M, S.sedute, S.corpo, c));
+        // tolgo dalla coda solo ciò che è partito: nel frattempo può essersi aggiunta una seduta
+        const ora = await codaDrive();
+        ora.cambiate = ora.cambiate.filter(x => !c.cambiate.includes(x));
+        ora.togli = ora.togli.filter(x => !c.togli.includes(x));
+        ora.sporco = ora.cambiate.length > 0 || ora.togli.length > 0;
+        await DB.kvMetti("driveCoda", ora);
+        S.drive = { stato: "ok", ts: Date.now(), n: r.scritti };
+        S.imp.driveUltimo = Date.now(); if (r.foglio) S.imp.driveFoglio = r.foglio; await salvaImp();
+      } catch (e) {
+        S.drive = { stato: e.message === "offline" ? "coda" : "errore", errore: e.message, n: c.cambiate.length };
+      }
+      return S.drive;
+    })().finally(() => { invioDrive = null; aggiornaDrive(); });
+    return invioDrive;
+  }
+  const oraBreve = ts => new Date(ts).toLocaleTimeString("it", { hour: "2-digit", minute: "2-digit" });
+  function testoDrive() {
+    if (!S.imp.driveUrl) return `Drive non collegato: <a href="#" data-az="vai" data-v="drive">collegalo una volta</a> e ogni seduta arriva da sola nella cartella Registro.`;
+    const d = S.drive || {};
+    if (d.stato === "invio") return "Invio a Drive…";
+    if (d.stato === "ok") return `Caricata su Drive ✓ alle ${oraBreve(d.ts)}`;
+    if (d.stato === "coda") return "Senza rete: in coda, parte da sola appena c'è campo.";
+    if (d.stato === "errore") return `Invio a Drive non riuscito: ${esc(d.errore)} Riprova più tardi da sola; <a href="#" data-az="vai" data-v="drive">dettagli</a>.`;
+    return S.imp.driveUltimo ? `Drive aggiornato alle ${oraBreve(S.imp.driveUltimo)}.` : "";
+  }
+  function aggiornaDrive() { const el = document.getElementById("statoDrive"); if (el) el.innerHTML = testoDrive(); }
 
   // ---------------- avvio ----------------
   async function avvio() {
@@ -98,6 +154,7 @@
     S.corpo = await DB.tutti("corpo");
     S.chat = (await DB.tutti("chat")).sort((a, b) => a.ts - b.ts);
     applicaTema();
+    sincronizzaDrive();
     try { S.alternative = await (await fetch("alternative.json")).json(); } catch (_) { S.alternative = {}; }
     if (location.hash.slice(1)) S.vista = location.hash.slice(1);
     render();
@@ -120,7 +177,7 @@
   function vai(v) { S.vista = v; history.replaceState(null, "", "#" + v); render(); window.scrollTo(0, 0); }
   function render() {
     for (const b of document.querySelectorAll("#nav button")) b.setAttribute("aria-current", String(b.dataset.vai === S.vista.split("/")[0]));
-    const f = { oggi: vOggi, corpo: vCorpo, coach: vCoach, altro: vAltro, storico: vStorico, partenza: vPartenza, assistente: vImpAssistente, aiuto: vAiuto, settimana: vSettimana }[S.vista.split("/")[0]] || vOggi;
+    const f = { oggi: vOggi, corpo: vCorpo, coach: vCoach, altro: vAltro, storico: vStorico, partenza: vPartenza, assistente: vImpAssistente, aiuto: vAiuto, settimana: vSettimana, drive: vDrive, andamento: vAndamento }[S.vista.split("/")[0]] || vOggi;
     f();
   }
 
@@ -203,7 +260,7 @@
       id: e.def.id, n: e.def.n, nome: e.def.nome, tipo: e.def.tipo, inc: e.def.tipo === "bilanciere" ? 2.5 : (e.def.inc || 2),
       perLato: !!e.def.perLato, dischiMacchina: !!e.def.dischiMacchina, nota: e.def.nota || "", motivo: e.motivo || "", rir: e.rir, range: e.range,
       ripTarget: e.rip.slice(), kgPiano: e.kg, mostraKg, lift: e.def.tipo === "bilanciere" ? e.def.lift : null, test: !!e.test, kgPrec: kgRipiego(e, w), alPostoDi: e.def.alPostoDi || null, deload: !!(w && (w.deload || w.taper)),
-      ultima: u ? `${u.iniziale ? "(partenza)" : dataBreve(u.data)}: ${M.fatte(u).map(s => (s.kg ? kg(s.kg) + "×" : "") + s.rip + (s.rir != null ? ` (${s.rir})` : "")).join(", ")}${u.nome && u.id !== e.def.id ? " · " + u.nome : ""}` : "",
+      ultima: u ? `${u.iniziale ? "(partenza)" : dataBreve(u.data)}: ${M.fatte(u).map(M.fmtSerie).join(", ")}${u.nome && u.id !== e.def.id ? " · " + u.nome : ""}` : "",
       serie: e.rip.map(r => ({ kg: mostraKg ? e.kg : null, rip: r, rir: null, ok: false })),
       tecnica: false, dolore: false, saltato: false, notaUtente: "", aperto: false
     };
@@ -294,10 +351,17 @@
       h += `<button class="ok ${s.ok ? "si" : ""}" data-az="ok" data-id="${esc(v.id)}" data-i="${i}" aria-label="Conferma serie ${i + 1}">✓</button>`;
       if (s.ok && v.tipo !== "salti") h += `<div class="rir"><span>RIR</span>${[0, 1, 2, 3, 4].map(r => `<button class="${s.rir === r ? "si" : ""}" data-az="rir" data-id="${esc(v.id)}" data-i="${i}" data-v="${r}">${r === 4 ? "4+" : r}</button>`).join("")}</div>`;
       h += `</div>`;
+      // serie divisa: stesse ripetizioni obiettivo, il resto con un peso più basso
+      (s.drop || []).forEach((d, k) => {
+        h += `<div class="serie scalo ${s.ok ? "fatta" : ""}"><span class="n" aria-hidden="true">↳</span>${passo(v.id, i, "kg", d.kg, "kg", k)}${passo(v.id, i, "rip", d.rip, "rip", k)}
+          <button class="togli" data-az="togliScalo" data-id="${esc(v.id)}" data-i="${i}" data-s="${k}" aria-label="Togli il secondo peso">✕</button></div>`;
+      });
+      if (s.drop && s.drop.length) h += `<div class="scalo-tot" id="tot-${esc(v.id)}-${i}">${totScalo(v, i)}</div>`;
     });
     const alt = altPer(v);
     h += `<div class="es-azioni">
       <button class="btn" data-az="piuSerie" data-id="${esc(v.id)}">+ serie</button>
+      ${v.mostraKg ? `<button class="btn" data-az="dividi" data-id="${esc(v.id)}">Dividi serie</button>` : ""}
       ${v.serie.length > 1 ? `<button class="btn" data-az="menoSerie" data-id="${esc(v.id)}">− serie</button>` : ""}
       ${v.tipo === "bilanciere" || v.tipo === "trazioni" ? `<button class="btn ${v.tecnica ? "attivo" : ""}" data-az="tecnica" data-id="${esc(v.id)}">${v.tipo === "trazioni" ? "ROM peggiorato" : "Tecnica peggiorata"}</button>` : ""}
       ${v.tipo === "bilanciere" ? `<button class="btn ${v.dolore ? "attivo" : ""}" data-az="dolore" data-id="${esc(v.id)}">Dolore</button>` : ""}
@@ -308,11 +372,38 @@
     h += `</div>`;
     return h;
   }
-  function passo(id, i, campo, val, u) {
+  // sk: indice del peso scalato dentro la serie (serie divisa); assente per la serie normale
+  function passo(id, i, campo, val, u, sk) {
     const vuoto = val == null || val === "";
-    return `<div class="passo ${vuoto ? "vuoto" : ""}"><button data-az="passo" data-id="${esc(id)}" data-i="${i}" data-c="${campo}" data-d="-1" aria-label="meno">−</button>
-      <input inputmode="decimal" data-campo="serie" data-id="${esc(id)}" data-i="${i}" data-c="${campo}" value="${vuoto ? "" : esc(campo === "kg" ? kg(val) : val)}" placeholder="?" aria-label="${u}">
-      <span class="u">${u}</span><button data-az="passo" data-id="${esc(id)}" data-i="${i}" data-c="${campo}" data-d="1" aria-label="più">+</button></div>`;
+    const ds = sk != null ? ` data-s="${sk}"` : "";
+    return `<div class="passo ${vuoto ? "vuoto" : ""}"><button data-az="passo" data-id="${esc(id)}" data-i="${i}"${ds} data-c="${campo}" data-d="-1" aria-label="meno">−</button>
+      <input inputmode="decimal" data-campo="serie" data-id="${esc(id)}" data-i="${i}"${ds} data-c="${campo}" value="${vuoto ? "" : esc(campo === "kg" ? kg(val) : val)}" placeholder="?" aria-label="${sk != null ? u + " dopo lo scalo" : u}">
+      <span class="u">${u}</span><button data-az="passo" data-id="${esc(id)}" data-i="${i}"${ds} data-c="${campo}" data-d="1" aria-label="più">+</button></div>`;
+  }
+  // ---- serie divisa (scalo nella stessa serie) ----
+  const obiettivoSerie = (v, i) => num(v.ripTarget[i] ?? v.ripTarget[v.ripTarget.length - 1]) ?? num(v.serie[i].rip) ?? 0;
+  function totScalo(v, i) {
+    const s = v.serie[i], parti = [num(s.rip) || 0].concat((s.drop || []).map(d => num(d.rip) || 0));
+    const tot = parti.reduce((a, x) => a + x, 0), ob = obiettivoSerie(v, i);
+    return `Totale ${parti.join(" + ")} = ${tot}${ob ? " su " + ob : ""}${ob && tot < ob ? " · mancano " + (ob - tot) : ""}`;
+  }
+  // con un solo scalo ancora non toccato, le sue ripetizioni completano l'obiettivo
+  function ricalcolaScalo(v, i) {
+    const s = v.serie[i];
+    if (!s.drop || s.drop.length !== 1 || !s.drop[0].auto) return;
+    s.drop[0].rip = Math.max(1, obiettivoSerie(v, i) - (num(s.rip) || 0));
+  }
+  function dividiSerie(v) {
+    let i = v.serie.findIndex(s => !s.ok);
+    if (i < 0) i = v.serie.length - 1;
+    const s = v.serie[i], ob = obiettivoSerie(v, i);
+    const daKg = num((s.drop && s.drop.length ? s.drop[s.drop.length - 1] : s).kg) ?? v.kgPiano ?? 0;
+    s.drop = s.drop || [];
+    if (!s.drop.length && (num(s.rip) ?? ob) >= ob) s.rip = Math.max(1, ob - 3);
+    const prima = s.drop.length === 0;
+    s.drop.push({ kg: Math.max(0, +(daKg - v.inc).toFixed(2)), rip: 1, auto: prima });
+    if (prima) ricalcolaScalo(v, i); else s.drop[s.drop.length - 1].rip = 2;
+    toast(`Serie ${i + 1} divisa: a ${kg(num(s.kg) ?? 0)} kg quante ne riesci, poi a ${kg(s.drop[s.drop.length - 1].kg)} kg fino a ${ob}. Correggi i numeri e tocca ✓.`, 4500);
   }
   function nomeDi(id) {
     for (const l of Object.keys(P.sedute)) { const e = P.sedute[l].esercizi.find(x => x.id === id); if (e) return e.nome; }
@@ -381,7 +472,12 @@
     const rec = { id: b.id, data: b.data, sett: b.sett, seduta: b.seduta, conD: b.conD, dueSedute: b.dueSedute || undefined, forma: b.forma, nota: b.nota, durataMin: b.modifica ? b.durataMin : Math.round((Date.now() - b.inizio) / 60000), esercizi: {} };
     for (const id of b.ordine) {
       const v = b.esercizi[id];
-      const serie = v.serie.filter(s => s.ok).map(s => ({ kg: v.mostraKg ? num(s.kg) : null, rip: num(s.rip), rir: s.rir }));
+      const serie = v.serie.filter(s => s.ok).map(s => {
+        const x = { kg: v.mostraKg ? num(s.kg) : null, rip: num(s.rip), rir: s.rir };
+        const drop = (s.drop || []).map(d => ({ kg: num(d.kg), rip: num(d.rip) })).filter(d => d.rip > 0);
+        if (drop.length) x.drop = drop;
+        return x;
+      });
       if (!serie.length && !v.saltato) continue;
       rec.esercizi[id] = { nome: v.nome, range: v.range, ripTarget: v.ripTarget, kgPiano: v.kgPiano, deload: v.deload, tecnica: v.tecnica, dolore: v.dolore || undefined, saltato: v.saltato, nota: v.notaUtente || undefined, alPostoDi: v.alPostoDi || undefined, test: v.test || undefined, serie };
     }
@@ -389,7 +485,9 @@
     S.sedute = S.sedute.filter(s => s.id !== rec.id).concat(rec);
     S.bozza = null; await DB.kvMetti("bozza", null);
     S.riepilogo = rec.id; S.forma = "ok"; S.pront = {};
+    await segnaDrive({ cambiata: rec.id });
     vibra(); render(); window.scrollTo(0, 0);
+    sincronizzaDrive();
   }
   function vRiepilogo() {
     const s = S.sedute.find(x => x.id === S.riepilogo);
@@ -398,7 +496,8 @@
     vista.innerHTML = `<h1>Seduta salvata ✓</h1><p class="tenue">${s.durataMin ? s.durataMin + " minuti · " : ""}come sul taccuino:</p>
       <pre class="testo">${esc(t)}</pre>
       <div class="fila"><button class="btn cresci" data-az="copia">Copia</button><button class="btn cresci" data-az="condividiTesto">Condividi</button></div>
-      <button class="btn prim largo" style="margin-top:10px" data-az="esporta">Backup su Drive</button>
+      <p class="tenue3" id="statoDrive" style="margin-top:10px">${testoDrive()}</p>
+      <button class="btn largo" style="margin-top:4px" data-az="esporta">Backup completo (con foto)</button>
       <button class="btn largo" style="margin-top:10px" data-az="chiudiRiepilogo">Fatto</button>`;
   }
 
@@ -484,6 +583,7 @@
     modifica(e);
     await DB.metti("corpo", e);
     S.corpo = S.corpo.filter(x => x.id !== d).concat(e);
+    await segnaDrive({});
   }
 
   // ================= COACH =================
@@ -497,7 +597,7 @@
   ];
   function vCoach() {
     let h = `<div class="fila"><h1 class="cresci">Coach</h1>${S.chat.length ? `<button class="btn piccolo" data-az="nuovaChat">Nuova chat</button>` : ""}</div>`;
-    if (!S.imp.chiave) h += `<div class="avviso">Senza chiave Gemini puoi comunque usare <b>Manda all'app Gemini</b> (testo + dati copiati). Per le risposte qui dentro: <a href="#" data-az="vai" data-v="assistente">Altro → Assistente</a>.</div>`;
+    if (!chiaveAttiva()) h += `<div class="avviso">Senza chiave puoi comunque usare <b>Manda all'app Gemini</b> (testo + dati copiati). Per le risposte qui dentro: <a href="#" data-az="vai" data-v="assistente">Altro → Assistente</a>.</div>`;
     h += `<div class="chat" id="chat">`;
     if (!S.chat.length) h += `<p class="tenue">Chiedi di esercizi, dolori, alternative, peso, misure e foto. Il coach vede il programma, le ultime sedute e i dati del corpo.</p>`;
     for (const m of S.chat) h += bolla(m);
@@ -508,9 +608,9 @@
       <div class="fila" style="flex-wrap:nowrap;margin-top:6px">
         <label class="btn" style="min-width:48px;padding:0;position:relative" aria-label="Allega foto">📷<input type="file" accept="image/*" data-campo="allegaFoto" style="position:absolute;inset:0;opacity:0"></label>
         <textarea id="domanda" rows="1" placeholder="Scrivi…" style="flex:1">${esc(S.bozzaDomanda || "")}</textarea>
-        <button class="btn prim" data-az="invia" ${S.inCorso ? "disabled" : ""}>${S.imp.chiave ? "Invia" : "Gemini"}</button>
+        <button class="btn prim" data-az="invia" ${S.inCorso ? "disabled" : ""}>${chiaveAttiva() ? "Invia" : "Gemini"}</button>
       </div>
-      ${S.imp.chiave ? `<div style="text-align:right"><a href="#" class="tenue3" data-az="mandaApp">Manda all'app Gemini</a></div>` : ""}
+      ${chiaveAttiva() ? `<div class="fila" style="justify-content:space-between"><span class="tenue3">${fornitore() === "gemini" ? "Gemini gratuito" : esc(nomeModello(S.imp.modelloOR))}${S.imp.spesaMese && S.imp.spesaMese.mese === oggi().slice(0, 7) ? " · questo mese " + dollari(S.imp.spesaMese.usd) : ""}</span><a href="#" class="tenue3" data-az="mandaApp">Manda all'app Gemini</a></div>` : ""}
     </div></div>`;
     vista.innerHTML = h;
     riempiFoto(vista);
@@ -519,7 +619,7 @@
     const c = $("#chat"); if (c) window.scrollTo(0, document.body.scrollHeight);
   }
   function bolla(m) {
-    return `<div class="msg ${m.ruolo === "user" ? "user" : "model"}">${(m.foto || []).map(f => `<img data-foto="${esc(f)}" alt="foto">`).join("")}${m.ruolo === "model" ? md(m.testo) : esc(m.testo).replace(/\n/g, "<br>")}${m.errore ? `<div class="avviso errore">${esc(m.errore)}</div>` : ""}</div>`;
+    return `<div class="msg ${m.ruolo === "user" ? "user" : "model"}">${(m.foto || []).map(f => `<img data-foto="${esc(f)}" alt="foto">`).join("")}${m.ruolo === "model" ? md(m.testo) : esc(m.testo).replace(/\n/g, "<br>")}${m.errore ? `<div class="avviso errore">${esc(m.errore)}</div>` : ""}${m.nota || m.costo != null ? `<div class="tenue3" style="margin-top:4px">${esc([m.nota, m.costo != null ? dollari(m.costo) : ""].filter(Boolean).join(" · "))}</div>` : ""}</div>`;
   }
   function md(t) {
     const righe = esc(t).split("\n");
@@ -557,7 +657,7 @@
     st += `Sedute fatte questa settimana: ${pr.fatte.join(", ") || "nessuna"}. Prossima consigliata: ${pr.scelta || "nessuna"}. ${pr.avvisi.join(" ")}\n`;
     if (S.bozza) st += `\n## Seduta in corso (${S.bozza.seduta})\n` + S.bozza.ordine.map(id => {
       const v = S.bozza.esercizi[id];
-      const f = v.serie.filter(s => s.ok).map(s => (s.kg ? kg(s.kg) + "×" : "") + s.rip + (s.rir != null ? ` (${s.rir})` : "")).join(", ");
+      const f = v.serie.filter(s => s.ok).map(s => M.fmtSerie({ kg: num(s.kg), rip: num(s.rip), rir: s.rir, drop: (s.drop || []).map(d => ({ kg: num(d.kg), rip: num(d.rip) })) })).join(", ");
       return `- ${v.nome}: piano ${v.ripTarget.join("/")}${v.kgPiano != null ? " @ " + kg(v.kgPiano) + " kg" : ""}; fatto: ${f || "niente"}${v.saltato ? " (saltato)" : ""}`;
     }).join("\n") + "\n";
     else if (w && pr.scelta) {
@@ -565,7 +665,7 @@
       st += `\n## Piano della prossima seduta (${pr.scelta})\n` + p.esercizi.map(e => `- ${e.def.nome}: ${pianoBreve(e)} — ${e.motivo}`).join("\n") + "\n";
     }
     const recenti = S.sedute.filter(s => M.giorni(s.data, d) <= 28).sort((a, b) => (a.data < b.data ? -1 : 1));
-    st += `\n## Sedute delle ultime 4 settimane (formato: kg×ripetizioni (RIR))\n` + (recenti.map(s => M.testoSeduta(P, s) + (s.forma === "giu" ? "\n(giornata no)" : s.forma === "rosso" ? "\n(giornata rossa: dormito male, indolenzito o senza energia)" : "")).join("\n\n") || "nessuna") + "\n";
+    st += `\n## Sedute delle ultime 4 settimane (formato: kg×ripetizioni (RIR); "20×8+17,5×4" = serie divisa: 8 ripetizioni a 20 kg, poi subito 4 a 17,5 kg per arrivare all'obiettivo)\n` + (recenti.map(s => M.testoSeduta(P, s) + (s.forma === "giu" ? "\n(giornata no)" : s.forma === "rosso" ? "\n(giornata rossa: dormito male, indolenzito o senza energia)" : "")).join("\n\n") || "nessuna") + "\n";
     const pob = M.progressoObiettivi(P, S.sedute, d);
     st += `\n## Obiettivi di dicembre: stima di oggi (serie migliore delle ultime 3 settimane)\n` + pob.map(r => `- ${r.nome}: obiettivo ${r.obiettivo.tipo === "trazioni" ? r.obiettivo.rip : kg(r.obiettivo.kg) + " × " + r.obiettivo.rip}; oggi ${r.stima == null ? "nessun dato" : r.obiettivo.tipo === "trazioni" ? "circa " + r.stima : "circa " + kg(r.stima) + " × " + r.obiettivo.rip}`).join("\n") + "\n";
     const sett = serieSettimanali().slice(-10);
@@ -587,7 +687,7 @@
     const ta = $("#domanda");
     const testo = (ta && ta.value.trim()) || "";
     if (!testo && !S.allegati.length) return toast("Scrivi una domanda.");
-    if (!S.imp.chiave) return mandaApp();
+    if (!chiaveAttiva()) return mandaApp();
     const msg = { id: uid(), ts: Date.now(), ruolo: "user", testo, foto: S.allegati.slice() };
     S.chat.push(msg); await DB.metti("chat", msg);
     S.allegati = []; S.bozzaDomanda = "";
@@ -603,11 +703,24 @@
         messaggi.push({ ruolo: m.ruolo, testo: m.testo + (!ultimo && m.foto && m.foto.length ? `\n[${m.foto.length} foto allegate a questo messaggio]` : ""), immagini });
       }
       const sistema = await contesto();
-      const { testo: risposta } = await A.invia({
-        chiave: S.imp.chiave, modello: S.imp.modello || IMP0.modello, sistema, messaggi, signal: S.ctrl.signal,
-        onTesto: t => { S.inCorso.testo = t; const el = $("#inCorso"); if (el) { el.innerHTML = md(t); } }
-      });
-      const r = { id: uid(), ts: Date.now(), ruolo: "model", testo: risposta };
+      const onTesto = t => { S.inCorso.testo = t; const el = $("#inCorso"); if (el) { el.innerHTML = md(t); } };
+      const conOR = () => A.invia({ fornitore: "openrouter", chiave: S.imp.chiaveOR, modello: S.imp.modelloOR || IMP0.modelloOR, sistema, messaggi, signal: S.ctrl.signal, onTesto });
+      let esito, nota = "";
+      if (fornitore() === "gemini") {
+        try { esito = await A.invia({ fornitore: "gemini", chiave: S.imp.chiave, modello: S.imp.modello || IMP0.modello, sistema, messaggi, signal: S.ctrl.signal, onTesto }); }
+        catch (e) {
+          // Gemini gratuito che non risponde: se c'è anche la chiave OpenRouter, la domanda passa lì
+          if (e.name === "AbortError" || !S.imp.chiaveOR || e.parziale) throw e;
+          S.inCorso.testo = ""; onTesto("");
+          esito = await conOR(); nota = "Gemini non rispondeva: risposta da OpenRouter.";
+        }
+      } else esito = await conOR();
+      if (esito.costo != null) {
+        const mese = oggi().slice(0, 7);
+        const sp = S.imp.spesaMese && S.imp.spesaMese.mese === mese ? S.imp.spesaMese : { mese, usd: 0, n: 0 };
+        S.imp.spesaMese = { mese, usd: sp.usd + esito.costo, n: sp.n + 1 }; await salvaImp();
+      }
+      const r = { id: uid(), ts: Date.now(), ruolo: "model", testo: esito.testo, costo: esito.costo, nota };
       S.chat.push(r); await DB.metti("chat", r);
     } catch (e) {
       const r = { id: uid(), ts: Date.now(), ruolo: "model", testo: S.inCorso.testo || "", errore: e.name === "AbortError" ? "Interrotto." : (e.message || String(e)) + (navigator.onLine ? "" : " (sei offline)") };
@@ -638,17 +751,18 @@
   // ================= ALTRO =================
   function vAltro() {
     vista.innerHTML = `<h1>Altro</h1>
-      <div class="card"><b>Backup</b><p class="tenue" style="font-size:14px">I dati stanno solo su questo telefono. Il backup crea un file con sedute, corpo, foto e chat: salvalo su Drive in Assistenti/Palestra/Registro (così lo legge anche il coach sul Mac).
+      <div class="card"><b>Backup completo</b><p class="tenue" style="font-size:14px">Il backup crea un file con tutto, anche foto e chat (l'invio automatico a Drive non le manda): salvalo su Drive in Assistenti/Palestra/Registro. Serve per passare a un telefono nuovo.
       ${S.imp.ultimoBackup ? `Ultimo: ${dataBreve(S.imp.ultimoBackup)}.` : "Mai fatto."}</p>
       <div class="fila"><button class="btn prim cresci" data-az="esporta">Esporta</button><button class="btn cresci" data-az="esporta" data-v="file">Scarica file</button><label class="btn cresci" style="position:relative">Importa<input type="file" accept=".json,.txt,application/json,text/plain" data-campo="importa" style="position:absolute;inset:0;opacity:0"></label></div></div>
       <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="storico">Storico sedute (${S.sedute.filter(s => !s.iniziale).length})</button>
       <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="partenza">Carichi di partenza</button>
-      <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="assistente">Assistente (Gemini)</button>
+      <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="drive">Invio automatico a Drive${S.imp.driveUrl ? " ✓" : ""}</button>
+      <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="assistente">Assistente (OpenRouter o Gemini)</button>
       <div class="card"><b>Palestra nuova</b><p class="tenue" style="font-size:14px">Cambi palestra (es. Melbourne)? Macchine e cavi pesano diverso da una palestra all'altra: da oggi l'app te ne fa ritrovare il carico. Bilancieri e manubri restano. Lo storico non si cancella.${S.imp.nuovaPalestra ? ` Ultimo cambio: ${dataBreve(S.imp.nuovaPalestra)}.` : ""}</p>
       <div class="fila"><button class="btn cresci" data-az="palestra">Sono in una palestra nuova</button>${S.imp.nuovaPalestra ? `<button class="btn piccolo" data-az="palestra" data-v="annulla">Annulla</button>` : ""}</div></div>
       <button class="btn largo" style="margin-top:8px" data-az="vai" data-v="aiuto">Niente distrazioni: blocca l'app sullo schermo</button>
       <div class="card"><b>Tema</b><div class="fila" style="margin-top:8px">${[["auto", "Automatico"], ["scuro", "Scuro"], ["chiaro", "Chiaro"]].map(([k, t]) => `<button class="btn piccolo cresci ${S.imp.tema === k ? "prim" : ""}" data-az="tema" data-v="${k}">${t}</button>`).join("")}</div></div>
-      <p class="tenue3">Programma versione ${esc(P.versione)} · i dati non lasciano il telefono, tranne i messaggi al coach (vanno a Google) e i backup che condividi tu.</p>`;
+      <p class="tenue3">Programma versione ${esc(P.versione)} · i dati restano sul telefono, tranne: sedute e misure sul tuo Drive (se collegato), i messaggi al coach (a OpenRouter o Google) e i backup che condividi tu.</p>`;
   }
   function vStorico() {
     const s = [...S.sedute].filter(x => !x.iniziale).sort((a, b) => (a.data < b.data ? 1 : -1));
@@ -663,7 +777,7 @@
     for (const [eid, e] of Object.entries(s.esercizi)) {
       const d = defDi(eid);
       b.ordine.push(eid);
-      b.esercizi[eid] = { id: eid, n: d ? d.n : "", nome: e.nome || (d && d.nome) || eid, tipo: d ? d.tipo : "accessorio", inc: d && d.inc || 2.5, perLato: !!(d && d.perLato), dischiMacchina: !!(d && d.dischiMacchina), nota: d && d.nota || "", motivo: "", rir: null, range: e.range, ripTarget: e.ripTarget || e.serie.map(x => x.rip), kgPiano: e.kgPiano, mostraKg: e.serie.some(x => x.kg), alPostoDi: e.alPostoDi || null, deload: e.deload, test: !!e.test, ultima: "", serie: e.serie.map(x => Object.assign({ ok: true }, x)), tecnica: !!e.tecnica, dolore: !!e.dolore, saltato: !!e.saltato, notaUtente: e.nota || "" };
+      b.esercizi[eid] = { id: eid, n: d ? d.n : "", nome: e.nome || (d && d.nome) || eid, tipo: d ? d.tipo : "accessorio", inc: d && d.inc || 2.5, perLato: !!(d && d.perLato), dischiMacchina: !!(d && d.dischiMacchina), nota: d && d.nota || "", motivo: "", rir: null, range: e.range, ripTarget: e.ripTarget || e.serie.map(x => x.rip), kgPiano: e.kgPiano, mostraKg: e.serie.some(x => x.kg), alPostoDi: e.alPostoDi || null, deload: e.deload, test: !!e.test, ultima: "", serie: e.serie.map(x => Object.assign({ ok: true }, x, x.drop ? { drop: x.drop.map(d => Object.assign({}, d)) } : {})), tecnica: !!e.tecnica, dolore: !!e.dolore, saltato: !!e.saltato, notaUtente: e.nota || "" };
     }
     S.bozza = b; salvaBozza(); vai("oggi");
   }
@@ -699,14 +813,65 @@
         const k = num(val("kg")), rir = num(val("rir"));
         rec.esercizi[e.id] = { nome: e.nome, range: e.range ? e.range.slice() : null, ripTarget: rip.slice(), serie: rip.map((r, i) => ({ kg: e.tipo === "trazioni" ? null : k, rip: r, rir: i === rip.length - 1 ? rir : null })) };
       }
-      if (Object.keys(rec.esercizi).length) { await DB.metti("sedute", rec); S.sedute = S.sedute.filter(s => s.id !== rec.id).concat(rec); }
+      if (Object.keys(rec.esercizi).length) { await DB.metti("sedute", rec); S.sedute = S.sedute.filter(s => s.id !== rec.id).concat(rec); await segnaDrive({}); }
       else { await DB.togli("sedute", rec.id); S.sedute = S.sedute.filter(s => s.id !== rec.id); }
     }
     toast("Salvati. I carichi previsti partono da qui."); vai("oggi");
   }
 
+  function vAndamento() {
+    vista.innerHTML = globalThis.Andamento.html(globalThis.Andamento.calcola(P, M, S.sedute, S.corpo, oggi()));
+  }
+  // tocco o passaggio del mouse su un grafico: crocino sul punto più vicino e valore in un fumetto
+  function suGrafico(ev) {
+    const box = ev.target.closest && ev.target.closest(".graf-box");
+    for (const b of document.querySelectorAll(".graf-box.attivo")) if (b !== box) { b.classList.remove("attivo"); b.querySelector(".suggerimento").hidden = true; for (const c of b.querySelectorAll(".croce,.croce-p")) c.setAttribute("visibility", "hidden"); }
+    if (!box) return;
+    const pts = JSON.parse(box.dataset.punti), svg = box.querySelector("svg"), r = svg.getBoundingClientRect();
+    const fx = (ev.clientX - r.left) / r.width;
+    let best = pts[0];
+    for (const p of pts) if (Math.abs(p[0] - fx) < Math.abs(best[0] - fx)) best = p;
+    const W = svg.viewBox.baseVal.width, x = best[0] * W;
+    const cr = box.querySelector(".croce"), cp = box.querySelector(".croce-p");
+    cr.setAttribute("x1", x); cr.setAttribute("x2", x); cr.setAttribute("visibility", "visible");
+    cp.setAttribute("cx", x); cp.setAttribute("cy", best[1]); cp.setAttribute("visibility", "visible");
+    const tip = box.querySelector(".suggerimento");
+    tip.textContent = best[2]; tip.hidden = false;
+    const sx = best[0] * r.width;
+    tip.style.left = Math.max(0, Math.min(r.width - tip.offsetWidth, sx - tip.offsetWidth / 2)) + "px";
+    box.classList.add("attivo");
+  }
+  document.addEventListener("pointermove", ev => { if (ev.pointerType === "mouse") suGrafico(ev); });
+  document.addEventListener("pointerdown", suGrafico);
+  function vDrive() {
+    const ok = !!S.imp.driveUrl;
+    vista.innerHTML = `<p><a href="#" data-az="vai" data-v="altro">← Altro</a></p><h1>Invio a Drive</h1>
+      <div class="card"><b>Come funziona</b><p class="tenue" style="font-size:14px">A ogni <b>Fine seduta</b> l'app manda la seduta a un piccolo script Google che gira con il tuo account. Lui scrive in <b>Assistenti/Palestra/Registro</b>: un file di testo per seduta, il foglio Google <b>Registro Work-out</b> (sedute, serie, corpo) e <b>work-out-dati.json</b> per il coach sul Mac. Foto, chat e chiavi non partono.</p>
+      <p class="tenue" style="font-size:14px">Da preparare una volta sola, 5 minuti dal computer: <a href="drive/istruzioni.html" target="_blank" rel="noopener">istruzioni passo passo</a>.</p></div>
+      <div class="card"><b>Indirizzo dello script</b><p class="tenue3">Finisce con /exec. Resta solo su questo telefono, non entra nei backup.</p>
+      <input data-campo="driveUrl" value="${esc(S.imp.driveUrl || "")}" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
+      ${ok ? "" : `<button class="btn prim largo" style="margin-top:8px" data-az="driveCollega">Collega</button>`}
+      <p class="tenue3" id="statoDrive" style="margin-top:8px">${ok ? testoDrive() : ""}</p>
+      ${ok ? `<div class="fila" style="margin-top:6px"><button class="btn cresci" data-az="driveTutto">Carica tutte le sedute</button>${S.imp.driveFoglio ? `<a class="btn cresci" href="${esc(S.imp.driveFoglio)}" target="_blank" rel="noopener">Apri il foglio</a>` : ""}</div>
+      <button class="btn piccolo" style="margin-top:8px" data-az="driveScollega">Scollega</button>` : ""}</div>`;
+  }
+  const nomeModello = id => ((A.MODELLI_OR.find(m => m[0] === id) || [id, id])[1].split(" · ")[0]);
+  const dollari = u => (u < 0.01 ? "$" + u.toFixed(4) : "$" + u.toFixed(3));
   function vImpAssistente() {
+    const f = fornitore();
+    const sp = S.imp.spesaMese && S.imp.spesaMese.mese === oggi().slice(0, 7) ? S.imp.spesaMese : null;
     vista.innerHTML = `<p><a href="#" data-az="vai" data-v="altro">← Altro</a></p><h1>Assistente</h1>
+      <div class="card"><b>Chi risponde nel Coach</b>
+      <div class="fila" style="margin-top:8px"><button class="btn piccolo ${f === "openrouter" ? "prim" : ""}" data-az="fornitore" data-v="openrouter">OpenRouter (DeepSeek)</button><button class="btn piccolo ${f === "gemini" ? "prim" : ""}" data-az="fornitore" data-v="gemini">Gemini gratuito</button></div>
+      <p class="tenue3">Se scegli Gemini e c'è anche la chiave OpenRouter, quando Gemini non risponde la domanda passa da sola a OpenRouter.</p></div>
+      <div class="card"><b>Chiave OpenRouter (a consumo, consigliata)</b>
+      <ol style="font-size:14px;padding-left:20px"><li>Apri <a href="https://openrouter.ai/settings/keys" target="_blank" rel="noopener">openrouter.ai/settings/keys</a> → "Create key".</li><li>Nome "Work-out", <b>limite di credito 2 $</b>: se la chiave finisse in mani sbagliate, non può spendere di più.</li><li>Copiala e incollala qui sotto.</li></ol>
+      <p class="tenue3">Costo con DeepSeek v4.1 Flash: circa 1 centesimo la prima domanda di una chat (il coach rilegge ogni volta manuale, profilo e sedute), 0,1-0,2 centesimi le successive. Legge anche le foto. La chiave resta solo su questo telefono e non entra nei backup.</p>
+      <input type="password" autocomplete="off" data-campo="imp" data-k="chiaveOR" value="${esc(S.imp.chiaveOR)}" placeholder="sk-or-…">
+      <label class="etich" style="margin-top:10px">Modello</label>
+      <div class="fila">${A.MODELLI_OR.map(([id, t]) => `<button class="btn piccolo ${S.imp.modelloOR === id ? "prim" : ""}" style="text-align:left" data-az="modelloOR" data-v="${esc(id)}">${esc(t)}</button>`).join("")}</div>
+      <input style="margin-top:6px" data-campo="imp" data-k="modelloOR" value="${esc(S.imp.modelloOR)}" aria-label="Modello OpenRouter">
+      <p class="tenue3">${sp ? `Speso questo mese: ${dollari(sp.usd)} in ${sp.n} risposte.` : "Nessuna spesa questo mese."}</p></div>
       <div class="card"><b>Chiave Gemini (gratuita)</b>
       <ol style="font-size:14px;padding-left:20px"><li>Apri <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> con il tuo account Google.</li><li>"Create API key", copiala, incollala qui sotto.</li></ol>
       <p class="tenue3">Livello gratuito: nessun costo, ma Google può usare i messaggi per migliorare i suoi modelli. Per le foto del fisico evita il viso. La chiave resta solo su questo telefono e non entra nei backup.</p>
@@ -732,7 +897,7 @@
   async function esporta(soloFile) {
     const foto = [];
     for (const f of await DB.tutti("foto")) foto.push({ id: f.id, data: f.data, posa: f.posa, mime: f.blob.type, b64: await A.blobBase64(f.blob) });
-    const imp = Object.assign({}, S.imp); delete imp.chiave;
+    const imp = senzaSegreti(S.imp);
     const dati = { app: "seduta", formato: 1, esportato: new Date().toISOString(), programma: P.versione, sedute: S.sedute, corpo: S.corpo, chat: S.chat, impostazioni: imp, foto };
     const testo = JSON.stringify(dati);
     const nome = `seduta-backup-${oggi()}.txt`;
@@ -763,7 +928,7 @@
       await DB.metti("foto", { id: f.id, data: f.data, posa: f.posa, blob: new Blob([u], { type: f.mime || "image/jpeg" }) }); n.foto++;
     }
     if (d.impostazioni) {
-      const imp = Object.assign({}, d.impostazioni); delete imp.chiave;
+      const imp = senzaSegreti(d.impostazioni);
       for (const k of Object.keys(imp)) if (imp[k] !== "" && imp[k] != null) S.imp[k] = imp[k];
       await salvaImp(); applicaTema();
     }
@@ -795,6 +960,10 @@
         const ik = fila && fila.querySelector('input[data-c="kg"]'), ir = fila && fila.querySelector('input[data-c="rip"]');
         if (ik && v.mostraKg) s.kg = num(ik.value);
         if (ir) s.rip = num(ir.value);
+        for (const inp of document.querySelectorAll(`input[data-campo="serie"][data-id="${CSS.escape(v.id)}"][data-i="${i}"][data-s]`)) {
+          const d = s.drop && s.drop[+inp.dataset.s];
+          if (d) d[inp.dataset.c] = num(inp.value);
+        }
         s.ok = !s.ok;
         if (s.ok) {
           vibra();
@@ -808,18 +977,28 @@
       }
       case "rir": v.serie[i].rir = v.serie[i].rir === +el.dataset.v ? null : +el.dataset.v; if (i === 0) controlloPrima(v); salvaBozza(); return render();
       case "passo": {
-        const c = el.dataset.c, s = v.serie[i], dlt = +el.dataset.d;
+        const c = el.dataset.c, dlt = +el.dataset.d;
+        if (el.dataset.s != null) {
+          const d = v.serie[i].drop[+el.dataset.s], inp = el.parentElement.querySelector("input");
+          if (inp) d[c] = num(inp.value);
+          if (c === "kg") d.kg = Math.max(0, +((num(d.kg) ?? 0) + dlt * v.inc).toFixed(2));
+          else { d.rip = Math.max(0, (num(d.rip) ?? 0) + dlt); d.auto = false; }
+          salvaBozza(); return render();
+        }
+        const s = v.serie[i];
         const inp = el.parentElement.querySelector("input");
         if (inp) s[c] = num(inp.value);
         if (c === "kg") {
           const base = num(s.kg) ?? (v.kgPiano ?? 0);
           s.kg = Math.max(0, +(base + dlt * v.inc).toFixed(2));
           for (let j = i + 1; j < v.serie.length; j++) if (!v.serie[j].ok) v.serie[j].kg = s.kg;
-        } else s.rip = Math.max(0, (num(s.rip) ?? 0) + dlt);
+        } else { s.rip = Math.max(0, (num(s.rip) ?? 0) + dlt); ricalcolaScalo(v, i); }
         salvaBozza(); return render();
       }
       case "piuSerie": { const u = v.serie[v.serie.length - 1]; v.serie.push({ kg: u.kg, rip: u.rip, rir: null, ok: false }); v.ripTarget.push(v.ripTarget[v.ripTarget.length - 1]); salvaBozza(); return render(); }
       case "menoSerie": { const u = v.serie[v.serie.length - 1]; if (u.ok && !confirm("L'ultima serie è già confermata. La tolgo?")) return; v.serie.pop(); v.ripTarget.pop(); salvaBozza(); return render(); }
+      case "dividi": dividiSerie(v); salvaBozza(); return render();
+      case "togliScalo": v.serie[i].drop.splice(+el.dataset.s, 1); if (!v.serie[i].drop.length) delete v.serie[i].drop; salvaBozza(); return render();
       case "tecnica": v.tecnica = !v.tecnica; salvaBozza(); return render();
       case "dolore": v.dolore = !v.dolore; if (v.dolore) toast("Segnato. Dolore sopra 3 su 10: chiudi l'esercizio qui."); salvaBozza(); return render();
       case "salta": v.saltato = !v.saltato; salvaBozza(); return render();
@@ -841,7 +1020,7 @@
       }
       case "esporta": return esporta(el.dataset.v === "file");
       case "modificaSed": return modificaSeduta(el.dataset.id);
-      case "eliminaSed": if (confirm("Elimino questa seduta?")) { await DB.togli("sedute", el.dataset.id); S.sedute = S.sedute.filter(s => s.id !== el.dataset.id); render(); } return;
+      case "eliminaSed": if (confirm("Elimino questa seduta?")) { await DB.togli("sedute", el.dataset.id); S.sedute = S.sedute.filter(s => s.id !== el.dataset.id); await segnaDrive({ tolta: el.dataset.id }); render(); sincronizzaDrive(); } return;
       case "salvaPartenza": return salvaPartenza();
       case "palestra":
         if (el.dataset.v === "annulla") { if (!confirm("Torno ai carichi delle macchine di prima?")) return; S.imp.nuovaPalestra = null; }
@@ -856,6 +1035,17 @@
         } catch (e) { box.innerHTML = `<div class="avviso errore">${esc(e.message)}</div>`; }
         return;
       }
+      case "driveTutto": { toast("Invio di tutte le sedute…"); const r = await sincronizzaDrive(true); if (r && r.stato === "ok") toast("Drive aggiornato ✓"); return; }
+      case "driveCollega": {
+        // di solito basta uscire dal campo (evento change); qui per chi tocca il pulsante senza uscire
+        const inp = document.querySelector('[data-campo="driveUrl"]');
+        if (inp && inp.value.trim() && !S.imp.driveUrl) inp.dispatchEvent(new Event("change", { bubbles: true }));
+        else if (!inp || !inp.value.trim()) toast("Incolla prima l'indirizzo che finisce con /exec.");
+        return;
+      }
+      case "driveScollega": if (!confirm("Scollego Drive? I file già caricati restano.")) return; S.imp.driveUrl = ""; await salvaImp(); return render();
+      case "fornitore": S.imp.fornitore = el.dataset.v; await salvaImp(); toast(el.dataset.v === "gemini" ? "Coach: Gemini." : "Coach: OpenRouter."); return render();
+      case "modelloOR": S.imp.modelloOR = el.dataset.v; await salvaImp(); toast("Modello: " + nomeModello(el.dataset.v)); return render();
       case "scegliModello": S.imp.modello = el.dataset.v; await salvaImp(); toast("Modello: " + el.dataset.v); return render();
       case "chip": { S.bozzaDomanda = CHIP[+el.dataset.i][1](); render(); const t = $("#domanda"); if (t) { t.focus(); const k = t.value.indexOf("["); if (k >= 0) t.setSelectionRange(k, t.value.indexOf("]", k) + 1); } return; }
       case "allegaCorpo": {
@@ -891,6 +1081,12 @@
     if (c === "serie") {
       const v = b.esercizi[el.dataset.id], i = +el.dataset.i, s = v.serie[i];
       const x = num(el.value);
+      if (el.dataset.s != null) {
+        const d = s.drop && s.drop[+el.dataset.s];
+        if (d) { d[el.dataset.c] = x; if (el.dataset.c === "rip") d.auto = false; }
+        const t = document.getElementById(`tot-${v.id}-${i}`); if (t) t.textContent = totScalo(v, i);
+        return salvaBozza();
+      }
       if (el.dataset.c === "kg") {
         s.kg = x;
         for (let j = i + 1; j < v.serie.length; j++) if (!v.serie[j].ok) {
@@ -898,7 +1094,15 @@
           const inp = document.querySelector(`input[data-campo="serie"][data-id="${CSS.escape(v.id)}"][data-i="${j}"][data-c="kg"]`);
           if (inp) inp.value = x == null ? "" : kg(x);
         }
-      } else s.rip = x;
+      } else {
+        s.rip = x;
+        if (s.drop) {
+          ricalcolaScalo(v, i);
+          const di = document.querySelector(`input[data-campo="serie"][data-id="${CSS.escape(v.id)}"][data-i="${i}"][data-s="0"][data-c="rip"]`);
+          if (di && s.drop[0]) di.value = s.drop[0].rip ?? "";
+          const t = document.getElementById(`tot-${v.id}-${i}`); if (t) t.textContent = totScalo(v, i);
+        }
+      }
       // niente render qui: su Android il change arriva quando si tocca ✓ e il ridisegno farebbe perdere il tocco
       return salvaBozza();
     }
@@ -933,11 +1137,23 @@
       S.allegati.push(id); return render();
     }
     if (c === "imp") { S.imp[el.dataset.k] = el.value.trim(); await salvaImp(); return toast("Salvato."); }
+    if (c === "driveUrl") {
+      const u = el.value.trim();
+      if (u && !G.urlValido(u)) return toast("Indirizzo non valido: copia quello che finisce con /exec.", 4000);
+      S.imp.driveUrl = u;
+      // codice segreto dell'app: lo script accetta solo il primo che riceve
+      if (u && !S.imp.driveToken) S.imp.driveToken = G.nuovoCodice();
+      await salvaImp(); render();
+      if (u) { const r = await sincronizzaDrive(true); toast(r && r.stato === "ok" ? "Collegato: sedute caricate su Drive ✓" : "Salvato, ma l'invio non è riuscito: vedi sotto.", 4000); }
+      return;
+    }
     if (c === "importa" && el.files[0]) { const f = el.files[0]; el.value = ""; return importa(f); }
   });
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && S.bozza) { clearTimeout(timerBozza); DB.kvMetti("bozza", S.bozza); }
+    if (!document.hidden) sincronizzaDrive();
   });
+  window.addEventListener("online", () => sincronizzaDrive());
   window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (h && h !== S.vista) { S.vista = h; render(); } });
 
   avvio().catch(e => { vista.innerHTML = `<div class="avviso errore">Errore all'avvio: ${esc(e.message)}</div>`; });
