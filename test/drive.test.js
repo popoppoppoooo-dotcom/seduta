@@ -134,4 +134,9 @@ test("script Google: crea cartella, file, foglio e JSON; aggiorna senza duplicar
   assert.equal(JSON.parse(g.get({ azione: "dati", token: tok })).app, "seduta");
   assert.match(g.get({ azione: "dati", token: "x" }), /non valido/);
   assert.match(g.get({}), /attivo/);
+  // una nota che sembra una formula resta testo
+  const g2 = google();
+  g2.post({ token: tok, fogli: { Sedute: [["Data", "Note"], ["2026-10-12", '=IMAGE("https://x")'], ["2026-10-13", -3]] } });
+  const sh = g2.fogli.get(g2.props.get("FOGLIO")).schede.get("Sedute");
+  assert.equal(sh[1][1], `'=IMAGE("https://x")`); assert.equal(sh[2][1], -3);
 });

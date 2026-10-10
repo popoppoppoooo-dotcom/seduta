@@ -88,7 +88,7 @@ function scriviFogli_(dir, fogli, p) {
     sh.clearContents();
     if (!righe.length) return;
     var larg = righe.reduce(function (m, r) { return Math.max(m, r.length); }, 0);
-    var piene = righe.map(function (r) { var x = r.slice(); while (x.length < larg) x.push(""); return x; });
+    var piene = righe.map(function (r) { var x = r.map(testo_); while (x.length < larg) x.push(""); return x; });
     sh.getRange(1, 1, piene.length, larg).setValues(piene);
     sh.setFrozenRows(1);
   });
@@ -104,6 +104,9 @@ function scriviJson_(dir, testo, p) {
   if (f) f.setContent(testo);
   else { f = dir.createFile(JSON_NOME, testo, "application/json"); p.setProperty("JSON", f.getId()); }
 }
+
+// un testo che inizia con = + - @ diventerebbe una formula del foglio: lo scrive come testo
+function testo_(v) { return typeof v === "string" && /^[=+\-@]/.test(v) ? "'" + v : v; }
 
 function pulisci_(s) { return String(s || "seduta").replace(/[\\/:*?"<>|]+/g, "-").slice(0, 120); }
 
